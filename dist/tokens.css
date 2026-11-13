@@ -1,0 +1,449 @@
+/* RC Misfits brand tokens. Generated from tokens.json by `pnpm build`: do not edit. */
+
+/* The default theme: Pit Lane. */
+:root {
+  color-scheme: dark;
+  --rm-bg: #17181B;
+  --rm-surface: #212328;
+  --rm-surface2: #2B2E34;
+  --rm-line: #353840;
+  --rm-text: #F2F2F0;
+  --rm-muted: #A9ACB3;
+  --rm-accent: #FFC72C;
+  --rm-on-accent: #17181B;
+  --rm-good: #1F4D36;
+  --rm-good-text: #9BF0C4;
+  --rm-pb: #4CC38A;
+  --rm-fast: #C3A2FF;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+  --rm-font-display: Oswald, "Arial Narrow", "Roboto Condensed", sans-serif;
+  --rm-font-body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rm-type-display-size: 2.5rem;
+  --rm-type-display-line: 2.75rem;
+  --rm-type-display-weight: 600;
+  --rm-type-display-tracking: 0.01em;
+  --rm-type-display: 600 2.5rem/2.75rem var(--rm-font-display);
+  --rm-type-title-size: 2rem;
+  --rm-type-title-line: 2.375rem;
+  --rm-type-title-weight: 500;
+  --rm-type-title-tracking: 0.01em;
+  --rm-type-title: 500 2rem/2.375rem var(--rm-font-display);
+  --rm-type-heading-size: 1.375rem;
+  --rm-type-heading-line: 1.75rem;
+  --rm-type-heading-weight: 500;
+  --rm-type-heading-tracking: 0.01em;
+  --rm-type-heading: 500 1.375rem/1.75rem var(--rm-font-display);
+  --rm-type-subheading-size: 1.125rem;
+  --rm-type-subheading-line: 1.5rem;
+  --rm-type-subheading-weight: 500;
+  --rm-type-subheading-tracking: 0.01em;
+  --rm-type-subheading: 500 1.125rem/1.5rem var(--rm-font-display);
+  --rm-type-body-size: 0.9375rem;
+  --rm-type-body-line: 1.375rem;
+  --rm-type-body-weight: 400;
+  --rm-type-body: 400 0.9375rem/1.375rem var(--rm-font-body);
+  --rm-type-body-sm-size: 0.8125rem;
+  --rm-type-body-sm-line: 1.125rem;
+  --rm-type-body-sm-weight: 400;
+  --rm-type-body-sm: 400 0.8125rem/1.125rem var(--rm-font-body);
+  --rm-type-control-size: 0.875rem;
+  --rm-type-control-line: 1.25rem;
+  --rm-type-control-weight: 600;
+  --rm-type-control: 600 0.875rem/1.25rem var(--rm-font-body);
+  --rm-type-label-size: 0.6875rem;
+  --rm-type-label-line: 1rem;
+  --rm-type-label-weight: 600;
+  --rm-type-label-tracking: 0.08em;
+  --rm-type-label: 600 0.6875rem/1rem var(--rm-font-body);
+  --rm-type-figure-size: 1rem;
+  --rm-type-figure-line: 1.375rem;
+  --rm-type-figure-weight: 600;
+  --rm-type-figure: 600 1rem/1.375rem var(--rm-font-body);
+  --rm-type-figure-lg-size: 1.75rem;
+  --rm-type-figure-lg-line: 2rem;
+  --rm-type-figure-lg-weight: 600;
+  --rm-type-figure-lg: 600 1.75rem/2rem var(--rm-font-body);
+  --rm-type-figure-xl-size: 3rem;
+  --rm-type-figure-xl-line: 3.25rem;
+  --rm-type-figure-xl-weight: 700;
+  --rm-type-figure-xl: 700 3rem/3.25rem var(--rm-font-body);
+  --rm-space-1: 0.25rem;
+  --rm-space-2: 0.5rem;
+  --rm-space-3: 0.75rem;
+  --rm-space-4: 1rem;
+  --rm-space-6: 1.5rem;
+  --rm-space-8: 2rem;
+  --rm-space-12: 3rem;
+  --rm-radius-sm: 4px;
+  --rm-radius-md: 6px;
+  --rm-radius-lg: 10px;
+  --rm-radius-full: 9999px;
+  --rm-race-black: #111111;
+  --rm-race-white: #ffffff;
+  --rm-race-silver: #c0c0c0;
+  --rm-race-red: #d32f2f;
+  --rm-race-orange: #f57c00;
+  --rm-race-yellow: #fdd835;
+  --rm-race-gold: #c9a227;
+  --rm-race-green: #2e7d32;
+  --rm-race-light-blue: #4fc3f7;
+  --rm-race-blue: #1565c0;
+  --rm-race-purple: #6a1b9a;
+  --rm-race-pink: #f48fb1;
+  --rm-race-fluoro-yellow: #e6ff00;
+  --rm-race-fluoro-green: #39ff14;
+  --rm-race-fluoro-orange: #ff5f1f;
+  --rm-race-fluoro-pink: #ff1493;
+}
+
+/* No theme chosen and the device asks for light: Pit Lane light. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --rm-bg: #F4F3EF;
+    --rm-surface: #FFFFFF;
+    --rm-surface2: #F0EEE8;
+    --rm-line: #DEDBD2;
+    --rm-text: #1B1C1F;
+    --rm-muted: #5C5F66;
+    --rm-accent: #B07A00;
+    --rm-on-accent: #FFFFFF;
+    --rm-good: #DDF3E6;
+    --rm-good-text: #1E5A3A;
+    --rm-pb: #1F8A55;
+    --rm-fast: #6B3FD1;
+    --rm-danger: #A92116;
+    --rm-warning: #8F5B00;
+  }
+}
+
+/* A chosen theme: <html data-theme="...">. */
+/* Pit Lane */
+[data-theme="pit-lane"] {
+  color-scheme: dark;
+  --rm-bg: #17181B;
+  --rm-surface: #212328;
+  --rm-surface2: #2B2E34;
+  --rm-line: #353840;
+  --rm-text: #F2F2F0;
+  --rm-muted: #A9ACB3;
+  --rm-accent: #FFC72C;
+  --rm-on-accent: #17181B;
+  --rm-good: #1F4D36;
+  --rm-good-text: #9BF0C4;
+  --rm-pb: #4CC38A;
+  --rm-fast: #C3A2FF;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Pit Lane light */
+[data-theme="pit-lane-light"] {
+  color-scheme: light;
+  --rm-bg: #F4F3EF;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F0EEE8;
+  --rm-line: #DEDBD2;
+  --rm-text: #1B1C1F;
+  --rm-muted: #5C5F66;
+  --rm-accent: #B07A00;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1F8A55;
+  --rm-fast: #6B3FD1;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Synthwave */
+[data-theme="synthwave"] {
+  color-scheme: dark;
+  --rm-bg: #140B24;
+  --rm-surface: #1E1234;
+  --rm-surface2: #2A1A47;
+  --rm-line: #3A2860;
+  --rm-text: #F7F3FA;
+  --rm-muted: #BBA9D3;
+  --rm-accent: #FF3EA5;
+  --rm-on-accent: #140B24;
+  --rm-good: #123B3C;
+  --rm-good-text: #7FF5DF;
+  --rm-pb: #5CF2A6;
+  --rm-fast: #46E5FF;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Synthwave light */
+[data-theme="synthwave-light"] {
+  color-scheme: light;
+  --rm-bg: #F8F4FB;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F1E9F7;
+  --rm-line: #E2D5EC;
+  --rm-text: #22123A;
+  --rm-muted: #5E4B78;
+  --rm-accent: #C2187A;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DCF5EE;
+  --rm-good-text: #14584A;
+  --rm-pb: #13865A;
+  --rm-fast: #0B7A99;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Garage */
+[data-theme="garage"] {
+  color-scheme: dark;
+  --rm-bg: #1C1A17;
+  --rm-surface: #26231F;
+  --rm-surface2: #322E28;
+  --rm-line: #3E3A33;
+  --rm-text: #F3EEE6;
+  --rm-muted: #B8AF9F;
+  --rm-accent: #FF6B1A;
+  --rm-on-accent: #1C1A17;
+  --rm-good: #26402C;
+  --rm-good-text: #A8E6B5;
+  --rm-pb: #6BD38A;
+  --rm-fast: #7FC3FF;
+  --rm-danger: #FF5EA1;
+  --rm-warning: #FFB648;
+}
+
+/* Garage light */
+[data-theme="garage-light"] {
+  color-scheme: light;
+  --rm-bg: #F8F8F7;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F2F1F0;
+  --rm-line: #E1DFDB;
+  --rm-text: #24221E;
+  --rm-muted: #6A6357;
+  --rm-accent: #C04400;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7B4C;
+  --rm-fast: #005DAF;
+  --rm-danger: #A91653;
+  --rm-warning: #8F5B00;
+}
+
+/* Fluoro */
+[data-theme="fluoro"] {
+  color-scheme: dark;
+  --rm-bg: #0E0F0C;
+  --rm-surface: #181A15;
+  --rm-surface2: #22251D;
+  --rm-line: #2F3328;
+  --rm-text: #F4F7EE;
+  --rm-muted: #A9B19A;
+  --rm-accent: #E6FF00;
+  --rm-on-accent: #0E0F0C;
+  --rm-good: #1F3D16;
+  --rm-good-text: #B4F59A;
+  --rm-pb: #39FF14;
+  --rm-fast: #FF6AD5;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Fluoro light */
+[data-theme="fluoro-light"] {
+  color-scheme: light;
+  --rm-bg: #F8F8F7;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F1F3EF;
+  --rm-line: #DFE2DA;
+  --rm-text: #22251D;
+  --rm-muted: #646C56;
+  --rm-accent: #6A7500;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7E4D;
+  --rm-fast: #B40081;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Racing Green */
+[data-theme="racing-green"] {
+  color-scheme: dark;
+  --rm-bg: #0F1A14;
+  --rm-surface: #16241C;
+  --rm-surface2: #1E3026;
+  --rm-line: #2A4033;
+  --rm-text: #F1EFE6;
+  --rm-muted: #A9B8AC;
+  --rm-accent: #D4AF37;
+  --rm-on-accent: #0F1A14;
+  --rm-good: #20402E;
+  --rm-good-text: #9FE3BC;
+  --rm-pb: #6FE39A;
+  --rm-fast: #8EC9FF;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Racing Green light */
+[data-theme="racing-green-light"] {
+  color-scheme: light;
+  --rm-bg: #F5F9F7;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #EDF5F1;
+  --rm-line: #D5E7DD;
+  --rm-text: #182A20;
+  --rm-muted: #49795F;
+  --rm-accent: #846B1C;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7E4D;
+  --rm-fast: #005EB4;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Works Blue */
+[data-theme="works-blue"] {
+  color-scheme: dark;
+  --rm-bg: #0B1630;
+  --rm-surface: #111F3D;
+  --rm-surface2: #182A52;
+  --rm-line: #24396A;
+  --rm-text: #F3F6FC;
+  --rm-muted: #A9B6D3;
+  --rm-accent: #FDD835;
+  --rm-on-accent: #0B1630;
+  --rm-good: #123A33;
+  --rm-good-text: #8FF0CF;
+  --rm-pb: #5CE6A0;
+  --rm-fast: #FF8AC8;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Works Blue light */
+[data-theme="works-blue-light"] {
+  color-scheme: light;
+  --rm-bg: #F4F6FA;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #EBEFF7;
+  --rm-line: #D1D8EB;
+  --rm-text: #141C2E;
+  --rm-muted: #495779;
+  --rm-accent: #816901;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7B4C;
+  --rm-fast: #B50060;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Red Line */
+[data-theme="red-line"] {
+  color-scheme: dark;
+  --rm-bg: #121212;
+  --rm-surface: #1C1C1E;
+  --rm-surface2: #26262A;
+  --rm-line: #34343A;
+  --rm-text: #F5F5F5;
+  --rm-muted: #ADADB3;
+  --rm-accent: #FF4D4A;
+  --rm-on-accent: #121212;
+  --rm-good: #1E3D2C;
+  --rm-good-text: #9BEFC0;
+  --rm-pb: #4CD98A;
+  --rm-fast: #7FB8FF;
+  --rm-danger: #FF5EA1;
+  --rm-warning: #FFB648;
+}
+
+/* Red Line light */
+[data-theme="red-line-light"] {
+  color-scheme: light;
+  --rm-bg: #F7F7F7;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F1F1F1;
+  --rm-line: #DEDEDE;
+  --rm-text: #212121;
+  --rm-muted: #616161;
+  --rm-accent: #DE0400;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7B4C;
+  --rm-fast: #0057C4;
+  --rm-danger: #A91653;
+  --rm-warning: #8F5B00;
+}
+
+/* Sunset */
+[data-theme="sunset"] {
+  color-scheme: dark;
+  --rm-bg: #1A1210;
+  --rm-surface: #251A16;
+  --rm-surface2: #30231D;
+  --rm-line: #433128;
+  --rm-text: #FBF4EC;
+  --rm-muted: #C3AE9C;
+  --rm-accent: #FFB22E;
+  --rm-on-accent: #1A1210;
+  --rm-good: #2A3D25;
+  --rm-good-text: #B8EBA5;
+  --rm-pb: #7FDB6A;
+  --rm-fast: #FF7AA8;
+  --rm-danger: #FF6B5E;
+  --rm-warning: #FFB648;
+}
+
+/* Sunset light */
+[data-theme="sunset-light"] {
+  color-scheme: light;
+  --rm-bg: #F9F6F6;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #F4EFEE;
+  --rm-line: #E6D9D6;
+  --rm-text: #291C19;
+  --rm-muted: #78534A;
+  --rm-accent: #996100;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E6;
+  --rm-good-text: #1E5A3A;
+  --rm-pb: #1C7B4C;
+  --rm-fast: #B90040;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Ice (light) */
+[data-theme="ice"] {
+  color-scheme: light;
+  --rm-bg: #F2F7FB;
+  --rm-surface: #FFFFFF;
+  --rm-surface2: #E7F0F7;
+  --rm-line: #D3E1EC;
+  --rm-text: #0F2133;
+  --rm-muted: #4A6075;
+  --rm-accent: #0277BD;
+  --rm-on-accent: #FFFFFF;
+  --rm-good: #DDF3E9;
+  --rm-good-text: #165A3F;
+  --rm-pb: #158A55;
+  --rm-fast: #7B3FD1;
+  --rm-danger: #A92116;
+  --rm-warning: #8F5B00;
+}
+
+/* Timing numbers: figures of equal width, so columns line up and digits do not jump. */
+.rm-figures {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}

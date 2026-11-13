@@ -1,0 +1,17 @@
+{
+  "id": "red-line",
+  "name": "RC Misfits: Red Line",
+  "dark": true,
+  "colors": {
+    "primary": "F5F5F5",
+    "secondary": "121212",
+    "tertiary": "FF4D4A",
+    "quaternary": "7FB8FF",
+    "header_background": "1C1C1E",
+    "header_primary": "F5F5F5",
+    "highlight": "FF4D4A",
+    "danger": "FF5EA1",
+    "success": "4CD98A",
+    "love": "FF5EA1"
+  }
+}

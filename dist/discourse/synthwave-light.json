@@ -1,0 +1,17 @@
+{
+  "id": "synthwave-light",
+  "name": "RC Misfits: Synthwave light",
+  "dark": false,
+  "colors": {
+    "primary": "22123A",
+    "secondary": "F8F4FB",
+    "tertiary": "C2187A",
+    "quaternary": "0B7A99",
+    "header_background": "FFFFFF",
+    "header_primary": "22123A",
+    "highlight": "C2187A",
+    "danger": "A92116",
+    "success": "13865A",
+    "love": "A92116"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "ice",
+  "name": "RC Misfits: Ice (light)",
+  "dark": false,
+  "colors": {
+    "primary": "0F2133",
+    "secondary": "F2F7FB",
+    "tertiary": "0277BD",
+    "quaternary": "7B3FD1",
+    "header_background": "FFFFFF",
+    "header_primary": "0F2133",
+    "highlight": "0277BD",
+    "danger": "A92116",
+    "success": "158A55",
+    "love": "A92116"
+  }
+}
