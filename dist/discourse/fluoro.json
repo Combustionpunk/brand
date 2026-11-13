@@ -1,0 +1,17 @@
+{
+  "id": "fluoro",
+  "name": "RC Misfits: Fluoro",
+  "dark": true,
+  "colors": {
+    "primary": "F4F7EE",
+    "secondary": "0E0F0C",
+    "tertiary": "E6FF00",
+    "quaternary": "FF6AD5",
+    "header_background": "181A15",
+    "header_primary": "F4F7EE",
+    "highlight": "E6FF00",
+    "danger": "FF6B5E",
+    "success": "39FF14",
+    "love": "FF6B5E"
+  }
+}

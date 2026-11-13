@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { contrast } from "../src/colour.ts";
-import { contrastFailures } from "../src/contrast.ts";
+import { MIN_TEXT_CONTRAST, contrastFailures } from "../src/contrast.ts";
 import { themeFromRoles } from "../src/generate.ts";
 import { defaultTheme, raceColours, themeIds, themes, tokens } from "../src/tokens.ts";
 import { THEME_KEYS } from "../src/types.ts";
@@ -9,13 +9,19 @@ import { CANVAS, CANVAS_KEYS, DARK_ONLY, FORUM_PALETTE } from "./canvas.ts";
 const HEX = /^#[0-9A-F]{6}$/;
 
 /**
- * Canvas values that miss 4.5:1. The issue says to use the canvas values exactly, and changing a
+ * Canvas values that miss the contrast rules: 4.5:1 for text and accents, and a difference in
+ * lightness between pb and fast. The issue says to use the canvas values exactly, and changing a
  * colour is a Board decision, so they are listed here instead of being changed. See the question
- * on issue #1. When the Board settles a value, delete its entry: the test then enforces 4.5:1.
+ * on issue #1. When the Board settles a value, delete its entry: the test then enforces the rule.
  */
 const BOARD_PENDING: Record<string, string[]> = {
+  "pit-lane": ["pb/fast"],
   "pit-lane-light": ["accent/bg", "accent/surface", "onAccent/accent", "pb/bg", "pb/surface"],
-  "synthwave-light": ["pb/bg", "fast/bg"],
+  synthwave: ["pb/fast"],
+  "synthwave-light": ["pb/bg", "pb/fast"],
+  garage: ["pb/fast"],
+  "racing-green": ["pb/fast"],
+  "red-line": ["pb/fast"],
   ice: ["accent/bg", "pb/bg", "pb/surface"],
 };
 
@@ -86,11 +92,11 @@ describe("tokens.json themes", () => {
 
 describe("contrast of every built-in theme", () => {
   for (const id of themeIds) {
-    it(`${id}: text and accents reach 4.5:1, and danger and warning differ in lightness`, () => {
+    it(`${id}: text and accents reach 4.5:1, and the pairs to tell apart differ in lightness`, () => {
       const failures = contrastFailures(themes[id]!.colours);
       expect(failures.map((f) => f.pair.join("/")).sort()).toEqual([...(BOARD_PENDING[id] ?? [])].sort());
       // The pending pairs still reach the large-text minimum, 3:1.
-      for (const failure of failures) {
+      for (const failure of failures.filter((f) => f.required === MIN_TEXT_CONTRAST)) {
         expect(failure.ratio, `${id} ${failure.pair.join("/")}`).toBeGreaterThanOrEqual(3);
       }
     });

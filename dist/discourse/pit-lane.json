@@ -1,0 +1,17 @@
+{
+  "id": "pit-lane",
+  "name": "RC Misfits: Pit Lane",
+  "dark": true,
+  "colors": {
+    "primary": "F2F2F0",
+    "secondary": "17181B",
+    "tertiary": "FFC72C",
+    "quaternary": "C3A2FF",
+    "header_background": "212328",
+    "header_primary": "F2F2F0",
+    "highlight": "FFC72C",
+    "danger": "FF6B5E",
+    "success": "4CC38A",
+    "love": "FF6B5E"
+  }
+}

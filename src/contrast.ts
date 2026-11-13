@@ -35,7 +35,11 @@ export const TEXT_PAIRS: ReadonlyArray<readonly [fg: ThemeKey, bg: ThemeKey]> = 
 ];
 
 /** Pairs that must also differ in lightness, by `MIN_LIGHTNESS_SEPARATION`. */
-export const DISTINCT_PAIRS: ReadonlyArray<readonly [ThemeKey, ThemeKey]> = [["danger", "warning"]];
+export const DISTINCT_PAIRS: ReadonlyArray<readonly [ThemeKey, ThemeKey]> = [
+  // A personal best and a fastest lap sit side by side in a timing row.
+  ["pb", "fast"],
+  ["danger", "warning"],
+];
 
 export interface ContrastFailure {
   pair: readonly [ThemeKey, ThemeKey];

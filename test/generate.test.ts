@@ -32,7 +32,7 @@ function expectSound(theme: ThemeColours, label: string) {
   for (const key of ["text", "muted", "accent", "pb", "fast", "danger", "warning"] as const) {
     expect(contrast(theme[key], theme.surface2), `${label} ${key} on surface2`).toBeGreaterThanOrEqual(4.5);
   }
-  // A personal best and a fastest lap sit side by side: they differ in lightness, not just hue.
+  // contrastFailures covers it, but spelled out: a personal best and a fastest lap differ in lightness.
   expect(contrast(theme.pb, theme.fast), `${label} pb against fast`).toBeGreaterThanOrEqual(MIN_LIGHTNESS_SEPARATION);
 }
 
@@ -85,10 +85,22 @@ describe("generateTheme: roles", () => {
   });
 
   it("falls back to Pit Lane when there is nothing chromatic (no colours, all white)", () => {
-    expect(generateTheme([], "dark")).toEqual(themes["pit-lane"]!.colours);
-    expect(generateTheme([], "light")).toEqual(themes["pit-lane-light"]!.colours);
-    expect(generateTheme([P.white, P.white, P.white], "dark")).toEqual(themes["pit-lane"]!.colours);
-    expect(generateTheme([P.white, P.white, P.white], "light")).toEqual(themes["pit-lane-light"]!.colours);
+    for (const mode of MODES) {
+      const pitLane = themes[mode === "dark" ? "pit-lane" : "pit-lane-light"]!.colours;
+      const theme = generateTheme([], mode);
+      expect(generateTheme([P.white, P.white, P.white], mode)).toEqual(theme);
+      expect(generateTheme([P.silver, P.black], mode)).toEqual(theme);
+      // The grounds and text are Pit Lane's own.
+      for (const key of ["bg", "surface", "surface2", "line", "text", "muted", "good", "goodText"] as const) {
+        expect(theme[key], `${mode} ${key}`).toBe(pitLane[key]);
+      }
+      // The accents are Pit Lane's too, moved in lightness only where a canvas value misses the
+      // contrast rules (see BOARD_PENDING in tokens.test.ts). Once those are settled, they are equal.
+      for (const key of ["accent", "pb", "fast", "danger", "warning"] as const) {
+        expect(hueDistance(hue(theme[key]), hue(pitLane[key])), `${mode} ${key}`).toBeLessThan(3);
+      }
+    }
+    expect(generateTheme([], "dark").accent).toBe("#FFC72C");
   });
 
   it("makes the colour with the most chroma the accent, wherever it is in the list", () => {
@@ -142,7 +154,8 @@ describe("generateTheme: roles", () => {
       const theme = generateTheme([P.fluoro_yellow, P.blue, P.light_blue], mode);
       expect(hueDistance(hue(theme.fast), hue(P.light_blue))).toBeLessThan(4);
     }
-    expect(generateTheme([P.fluoro_yellow, P.blue, P.light_blue], "dark").fast).toBe("#4FC3F7");
+    // Already readable and distinct from pb: used as it is.
+    expect(generateTheme([P.fluoro_yellow, P.purple, P.yellow], "dark").fast).toBe("#FDD835");
   });
 
   it("otherwise uses the accent's opposite hue as the highlight", () => {
