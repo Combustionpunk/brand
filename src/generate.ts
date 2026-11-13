@@ -52,16 +52,19 @@ const hueDistance = (a: number, b: number): number => {
 
 /**
  * Sorts up to three colours into roles:
- * - white, black and silver (low chroma) are neutral and take no role;
+ * - white, black and silver (low chroma) are neutral and take no role, and repeats count once;
  * - the accent is the colour with the most chroma (the earlier one wins a tie);
  * - the tint is the deepest (darkest) colour left;
  * - the highlight is the one after that.
  */
 export function pickRoles(colours: readonly string[] = []): ThemeRoles {
-  const chromatic = colours
-    .slice(0, 3)
-    .map(normaliseHex)
-    .filter((hex) => chroma(hex) >= NEUTRAL_CHROMA);
+  if (!Array.isArray(colours)) {
+    throw new RangeError("Colours must be an array of up to three hex colours.");
+  }
+  // The same colour given twice counts once, so it cannot be both the accent and the highlight.
+  const chromatic = [...new Set(colours.slice(0, 3).map(normaliseHex))].filter(
+    (hex) => chroma(hex) >= NEUTRAL_CHROMA,
+  );
 
   const roles: ThemeRoles = {};
   if (chromatic.length === 0) {
@@ -175,7 +178,11 @@ function accessible(raw: ThemeColours, mode: ThemeMode): ThemeColours {
   };
 }
 
-/** Pit Lane, for when there is nothing chromatic to work with. */
+/**
+ * Pit Lane, for when there is nothing chromatic to work with. It goes through `accessible` like
+ * all generator output, so where a Pit Lane value misses the contrast rules the result differs
+ * from the built-in theme in lightness. Where Pit Lane meets them, the two are identical.
+ */
 function fallback(mode: ThemeMode): ThemeColours {
   const id = mode === "dark" ? tokens.defaultTheme : tokens.defaultLightTheme;
   return accessible({ ...tokens.themes[id]!.colours }, mode);
@@ -262,7 +269,8 @@ export function themeFromRoles(roles: ThemeRoles, mode: ThemeMode = "dark"): The
  * - Accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` are adjusted in lightness until
  *   each reaches 4.5:1 on `bg`, `surface` and `surface2`.
  * - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
- * - With no chromatic colour at all (none given, or all white), the result is Pit Lane.
+ * - With no chromatic colour at all (none given, or all white), the result is Pit Lane, with
+ *   lightness adjusted where Pit Lane itself misses the rules above.
  *
  * Only the first three colours are used. Throws a `RangeError` for a value that is not a hex
  * colour or a mode that is not `"dark"` or `"light"`.

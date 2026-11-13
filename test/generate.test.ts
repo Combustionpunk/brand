@@ -237,6 +237,21 @@ describe("generateTheme: input handling", () => {
     expect(generateTheme(["#ff0000", "#0000FF"])).toEqual(generateTheme(["F00", "00f"]));
   });
 
+  it("counts a repeated colour once", () => {
+    expect(pickRoles([P.red, P.red, P.red])).toEqual({ accent: "#D32F2F" });
+    expect(pickRoles(["#f00", "#FF0000", P.blue])).toEqual({ accent: "#FF0000", tint: "#1565C0" });
+    for (const mode of MODES) {
+      const theme = generateTheme([P.purple, P.purple, P.purple], mode);
+      expect(theme).toEqual(generateTheme([P.purple], mode));
+      expect(theme.fast).not.toBe(theme.accent);
+    }
+  });
+
+  it("throws a RangeError when the colours are not an array", () => {
+    expect(() => generateTheme(null as unknown as string[])).toThrow(RangeError);
+    expect(() => generateTheme("#ff0000" as unknown as string[])).toThrow(RangeError);
+  });
+
   it("uses the first three colours only", () => {
     expect(generateTheme([P.red, P.blue, P.gold, P.fluoro_green])).toEqual(generateTheme([P.red, P.blue, P.gold]));
   });

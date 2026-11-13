@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -101,8 +102,17 @@ describe("fonts", () => {
 });
 
 describe("the logo", () => {
-  it("is shipped as it was given", () => {
-    expect(existsSync(resolve(root, "assets/logo/rc-misfits-logo.svg"))).toBe(true);
-    expect(existsSync(resolve(root, "assets/logo/rc-misfits-logo.png"))).toBe(true);
+  // The files Yeti added on 13 Nov 2026. They are never edited, recoloured or redrawn here.
+  // If the Board replaces the master, update these hashes in the same change.
+  const MASTERS: Record<string, string> = {
+    "assets/logo/rc-misfits-logo.svg": "18eaa34f4c70e6da0a175379ca97927d7e2bb7730dfbf78a092ebebe141ffdb5",
+    "assets/logo/rc-misfits-logo.png": "2c9ad16e99795afe2257d1c4bca004c067980c7f3604947e99551a273ddd0537",
+  };
+
+  it("is shipped exactly as it was given", () => {
+    for (const [path, hash] of Object.entries(MASTERS)) {
+      const actual = createHash("sha256").update(readFileSync(resolve(root, path))).digest("hex");
+      expect(actual, path).toBe(hash);
+    }
   });
 });

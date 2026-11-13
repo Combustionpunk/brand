@@ -21,9 +21,9 @@ export const EXAMPLES: Array<{ label: string; keys: string[] }> = [
 const raceHex = (key: string) => tokens.raceColours.find((colour) => colour.key === key)!.hex;
 
 const ROWS = [
-  { pos: 1, driver: "A. Whitlock", car: ["fluoro_yellow", "blue"], laps: 24, last: "14.207", best: "13.882", mark: "fast" },
-  { pos: 2, driver: "S. Okafor", car: ["red", "white", "black"], laps: 24, last: "14.031", best: "14.031", mark: "pb" },
-  { pos: 3, driver: "J. Marsh", car: ["purple", "fluoro_pink"], laps: 23, last: "15.440", best: "14.356", mark: "" },
+  { pos: 1, driver: "Driver One", car: ["fluoro_yellow", "blue"], laps: 24, last: "14.207", best: "13.882", mark: "fast" },
+  { pos: 2, driver: "Driver Two", car: ["red", "white", "black"], laps: 24, last: "14.031", best: "14.031", mark: "pb" },
+  { pos: 3, driver: "Driver Three", car: ["purple", "fluoro_pink"], laps: 23, last: "15.440", best: "14.356", mark: "" },
 ];
 
 function card(title: string, subtitle: string, colours: ThemeColours, attributes: string): string {
@@ -51,7 +51,7 @@ function card(title: string, subtitle: string, colours: ThemeColours, attributes
         <nav aria-label="Sites">
           <a href="#">Forum</a><a href="#">Meetings</a><a href="#">Tracks</a><a href="#" aria-current="page">Timing</a>
         </nav>
-        <span class="user">yeti</span>
+        <span class="user">Sign in</span>
       </header>
       <div class="body">
         <h2>${escape(title)}</h2>

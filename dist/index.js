@@ -697,7 +697,12 @@ var hueDistance = (a, b) => {
   return d > 180 ? 360 - d : d;
 };
 function pickRoles(colours = []) {
-  const chromatic = colours.slice(0, 3).map(normaliseHex).filter((hex) => chroma(hex) >= NEUTRAL_CHROMA);
+  if (!Array.isArray(colours)) {
+    throw new RangeError("Colours must be an array of up to three hex colours.");
+  }
+  const chromatic = [...new Set(colours.slice(0, 3).map(normaliseHex))].filter(
+    (hex) => chroma(hex) >= NEUTRAL_CHROMA
+  );
   const roles = {};
   if (chromatic.length === 0) {
     return roles;

@@ -12,7 +12,7 @@ export interface ThemeRoles {
 }
 /**
  * Sorts up to three colours into roles:
- * - white, black and silver (low chroma) are neutral and take no role;
+ * - white, black and silver (low chroma) are neutral and take no role, and repeats count once;
  * - the accent is the colour with the most chroma (the earlier one wins a tie);
  * - the tint is the deepest (darkest) colour left;
  * - the highlight is the one after that.
@@ -40,7 +40,8 @@ export declare function themeFromRoles(roles: ThemeRoles, mode?: ThemeMode): The
  * - Accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` are adjusted in lightness until
  *   each reaches 4.5:1 on `bg`, `surface` and `surface2`.
  * - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
- * - With no chromatic colour at all (none given, or all white), the result is Pit Lane.
+ * - With no chromatic colour at all (none given, or all white), the result is Pit Lane, with
+ *   lightness adjusted where Pit Lane itself misses the rules above.
  *
  * Only the first three colours are used. Throws a `RangeError` for a value that is not a hex
  * colour or a mode that is not `"dark"` or `"light"`.

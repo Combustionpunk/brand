@@ -72,6 +72,8 @@ if (theme) {
 }
 ```
 
+A member's or club's choice is either a theme id, as above, or its own colours ("Match my car", "club colours"). For colours, generate the theme as in the next step. The order stays the same.
+
 ### 5. A generated theme ("Match my car", "club colours")
 
 ```ts
@@ -207,7 +209,8 @@ Every timing number uses figures of equal width, so columns line up and digits d
 - `pb` is a fixed green. `good`, `danger` and `warning` are fixed too. `danger` moves from red to rose when the accent itself is red or orange.
 - The lightness of the accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` is adjusted until each is at least 4.5:1 on `bg`, `surface` and `surface2`.
 - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
-- With no chromatic colour (no colours, or all white, black and silver), the result is Pit Lane.
+- With no chromatic colour (no colours, or all white, black and silver), the result is Pit Lane (or Pit Lane light). Like all generator output it is held to the contrast rules, so a Pit Lane value that misses them comes out a little lighter or darker than in the built-in theme.
+- The same colour given twice counts once.
 - Only the first three colours are used. A value that is not a hex colour throws a `RangeError`.
 
 ## Discourse colour mapping
