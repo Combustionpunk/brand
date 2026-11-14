@@ -150,6 +150,16 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 
 The six `-light` themes from Garage to Sunset come from the generator's light mode.
 
+Five colours differ from the design canvas. The Board made them darker (14 Nov 2026) so that each reaches 4.5:1 on its background:
+
+| Theme | Key | Canvas | Now |
+|---|---|---|---|
+| `pit-lane-light` | `accent` | `#B07A00` | `#946700` |
+| `pit-lane-light` | `pb` | `#1F8A55` | `#1C7E4D` |
+| `synthwave-light` | `pb` | `#13865A` | `#127F55` |
+| `ice` | `accent` | `#0277BD` | `#0275BA` |
+| `ice` | `pb` | `#158A55` | `#148150` |
+
 ### Theme keys
 
 | Key | CSS variable | Use |
@@ -169,7 +179,7 @@ The six `-light` themes from Garage to Sunset come from the generator's light mo
 | `danger` | `--rm-danger` | Errors. |
 | `warning` | `--rm-warning` | Warnings. |
 
-Do not rely on colour alone: show a personal best and a fastest lap with a label or icon too.
+**Always label a personal best and a fastest lap (PB / FL). Never rely on colour alone.** In several themes `pb` and `fast` differ by hue only, not by lightness, so the colour by itself does not tell them apart for everyone.
 
 ### Other variables
 

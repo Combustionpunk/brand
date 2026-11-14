@@ -1,4 +1,7 @@
-/** The Board's design canvas values, copied from issue #1. The tokens must match these exactly. */
+/**
+ * The Board's design canvas values, copied from issue #1. The tokens must match these exactly,
+ * apart from the values the Board changed afterwards (`BOARD_AMENDED`, below).
+ */
 export const CANVAS_KEYS = [
   "bg",
   "surface",
@@ -34,6 +37,17 @@ export interface CanvasTheme {
   colours: Record<(typeof CANVAS_KEYS)[number], string>;
 }
 
+/**
+ * Canvas values the Board replaced on 14 Nov 2026 (PR #4): the five that were under 4.5:1 on
+ * `bg`, each moved darker in the same hue. The table above keeps the original canvas values.
+ */
+export const BOARD_AMENDED: Record<string, Partial<CanvasTheme["colours"]>> = {
+  "pit-lane-light": { accent: "#946700", pb: "#1C7E4D" }, // canvas #B07A00, #1F8A55
+  "synthwave-light": { pb: "#127F55" }, // canvas #13865A
+  ice: { accent: "#0275BA", pb: "#148150" }, // canvas #0277BD, #158A55
+};
+
+/** The canvas table, with the Board's amendments applied: what `tokens.json` must hold. */
 export const CANVAS: CanvasTheme[] = TABLE.trim()
   .split("\n")
   .map((row) => {
@@ -41,7 +55,10 @@ export const CANVAS: CanvasTheme[] = TABLE.trim()
     return {
       id: id!,
       name: name!,
-      colours: Object.fromEntries(CANVAS_KEYS.map((key, i) => [key, values[i]!])) as CanvasTheme["colours"],
+      colours: {
+        ...Object.fromEntries(CANVAS_KEYS.map((key, i) => [key, values[i]!])),
+        ...BOARD_AMENDED[id!],
+      } as CanvasTheme["colours"],
     };
   });
 

@@ -4,29 +4,19 @@ import { MIN_TEXT_CONTRAST, contrastFailures } from "../src/contrast.ts";
 import { themeFromRoles } from "../src/generate.ts";
 import { defaultTheme, raceColours, themeIds, themes, tokens } from "../src/tokens.ts";
 import { THEME_KEYS } from "../src/types.ts";
-import { CANVAS, CANVAS_KEYS, DARK_ONLY, FORUM_PALETTE } from "./canvas.ts";
+import { BOARD_AMENDED, CANVAS, CANVAS_KEYS, DARK_ONLY, FORUM_PALETTE } from "./canvas.ts";
 
 const HEX = /^#[0-9A-F]{6}$/;
 
 /**
- * Canvas values that miss the contrast rules: 4.5:1 for text and accents, and a difference in
- * lightness between pb and fast. The issue says to use the canvas values exactly, and changing a
- * colour is a Board decision, so they are listed here instead of being changed. See the question
- * on issue #1. When the Board settles a value, delete its entry: the test then enforces the rule.
+ * Canvas themes whose personal-best green and fastest-lap colour differ by hue only. The Board
+ * accepted this on 14 Nov 2026 (PR #4): the apps must always label them (PB / FL) and never rely
+ * on colour alone. Every other contrast rule holds for every theme, with no exceptions.
  */
-const BOARD_PENDING: Record<string, string[]> = {
-  "pit-lane": ["pb/fast"],
-  "pit-lane-light": ["accent/bg", "accent/surface", "onAccent/accent", "pb/bg", "pb/surface"],
-  synthwave: ["pb/fast"],
-  "synthwave-light": ["pb/bg", "pb/fast"],
-  garage: ["pb/fast"],
-  "racing-green": ["pb/fast"],
-  "red-line": ["pb/fast"],
-  ice: ["accent/bg", "pb/bg", "pb/surface"],
-};
+const PB_FAST_HUE_ONLY = ["pit-lane", "synthwave", "synthwave-light", "garage", "racing-green", "red-line", "ice"];
 
 describe("tokens.json themes", () => {
-  it("has the Board's canvas values exactly", () => {
+  it("has the Board's canvas values exactly, with the Board's amendments", () => {
     for (const canvas of CANVAS) {
       const theme = themes[canvas.id];
       expect(theme, canvas.id).toBeDefined();
@@ -93,18 +83,27 @@ describe("tokens.json themes", () => {
 describe("contrast of every built-in theme", () => {
   for (const id of themeIds) {
     it(`${id}: text and accents reach 4.5:1, and the pairs to tell apart differ in lightness`, () => {
-      const failures = contrastFailures(themes[id]!.colours);
-      expect(failures.map((f) => f.pair.join("/")).sort()).toEqual([...(BOARD_PENDING[id] ?? [])].sort());
-      // The pending pairs still reach the large-text minimum, 3:1.
-      for (const failure of failures.filter((f) => f.required === MIN_TEXT_CONTRAST)) {
-        expect(failure.ratio, `${id} ${failure.pair.join("/")}`).toBeGreaterThanOrEqual(3);
-      }
+      const failures = contrastFailures(themes[id]!.colours).map((f) => f.pair.join("/"));
+      expect(failures).toEqual(PB_FAST_HUE_ONLY.includes(id) ? ["pb/fast"] : []);
     });
   }
 
-  it("only excuses canvas themes", () => {
-    for (const id of Object.keys(BOARD_PENDING)) {
+  it("only lets canvas themes have a hue-only pb and fast", () => {
+    for (const id of PB_FAST_HUE_ONLY) {
       expect(CANVAS.map((c) => c.id)).toContain(id);
+    }
+  });
+
+  it("has only amended canvas values that were below 4.5:1 and now pass", () => {
+    for (const [id, amended] of Object.entries(BOARD_AMENDED)) {
+      const { colours } = themes[id]!;
+      for (const key of Object.keys(amended) as Array<keyof typeof amended>) {
+        expect(colours[key], `${id} ${key}`).toBe(amended[key]);
+        expect(contrast(colours[key], colours.bg), `${id} ${key} on bg`).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+        expect(contrast(colours[key], colours.surface), `${id} ${key} on surface`).toBeGreaterThanOrEqual(
+          MIN_TEXT_CONTRAST,
+        );
+      }
     }
   });
 });

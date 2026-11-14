@@ -94,8 +94,8 @@ describe("generateTheme: roles", () => {
       for (const key of ["bg", "surface", "surface2", "line", "text", "muted", "good", "goodText"] as const) {
         expect(theme[key], `${mode} ${key}`).toBe(pitLane[key]);
       }
-      // The accents are Pit Lane's too, moved in lightness only where a canvas value misses the
-      // contrast rules (see BOARD_PENDING in tokens.test.ts). Once those are settled, they are equal.
+      // The accents are Pit Lane's too, moved in lightness only where the generator's rules are
+      // stricter than the built-in theme's: 4.5:1 on surface2 as well, and pb and fast apart.
       for (const key of ["accent", "pb", "fast", "danger", "warning"] as const) {
         expect(hueDistance(hue(theme[key]), hue(pitLane[key])), `${mode} ${key}`).toBeLessThan(3);
       }
