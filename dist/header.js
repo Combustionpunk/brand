@@ -9,7 +9,7 @@ var SITE_NAMES = {
 };
 var LINKS = [
   { id: "forum", label: "Forum", attribute: "forum-url", defaultUrl: "https://forum.rcmisfits.org/" },
-  { id: "meetings", label: "Meetings", attribute: "meetings-url", defaultUrl: "https://forum.rcmisfits.org/c/meetings" },
+  { id: "meetings", label: "Meetings", attribute: "meetings-url", defaultUrl: "https://forum.rcmisfits.org/events" },
   { id: "tracks", label: "Tracks", attribute: "tracks-url", defaultUrl: "https://tracks.rcmisfits.org/" },
   { id: "timing", label: "Timing", attribute: "timing-url", defaultUrl: "https://timing.rcmisfits.org/" }
 ];

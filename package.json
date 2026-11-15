@@ -1,6 +1,6 @@
 {
   "name": "@rcmisfits/brand",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The RC Misfits look: design tokens, the theme generator, fonts and the logo, shared by every app.",
   "license": "UNLICENSED",
   "private": true,

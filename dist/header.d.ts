@@ -45,6 +45,8 @@ declare const Base: typeof HTMLElement;
 /**
  * `<rm-header>`. Sign in and Sign out send a cancelable `rm-sign-in` / `rm-sign-out` event
  * (bubbling) before following their link; an app that calls `preventDefault()` on it handles it itself.
+ * `sign-out-url` is only for a URL that is safe to GET: an app whose sign-out is a POST leaves it off
+ * and handles `rm-sign-out`.
  */
 export declare class RmHeader extends Base {
     #private;

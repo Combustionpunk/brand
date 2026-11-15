@@ -12,7 +12,7 @@ The one source of the RC Misfits look: design tokens, the theme generator, fonts
 ### 1. Install, pinned to a tag
 
 ```sh
-pnpm add github:Combustionpunk/brand#v0.1.0
+pnpm add github:Combustionpunk/brand#v0.2.0
 ```
 
 - The package name is `@rcmisfits/brand`.
@@ -138,20 +138,22 @@ import "@rcmisfits/brand/header.js"; // defines <rm-header>
 ```
 
 ```html
-<rm-header site="tracks" user="Yeti" sign-out-url="/auth/logout"></rm-header>
+<rm-header site="tracks" user="Yeti"></rm-header>
 ```
 
 | Attribute | Meaning |
 |---|---|
 | `site` | `forum`, `tracks` or `timing`: the current site. It is highlighted (`aria-current="page"`) and named after RC MISFITS. Anything else highlights nothing. |
 | `user` | The signed-in username. Empty or missing means signed out. |
-| `sign-in-url`, `sign-out-url` | Where Sign in and Sign out go. With no URL, they are buttons that only send the event below. |
-| `forum-url`, `meetings-url`, `tracks-url`, `timing-url` | The four links. Default: the live sites (`https://forum.rcmisfits.org/`, `https://forum.rcmisfits.org/c/meetings`, `https://tracks.rcmisfits.org/`, `https://timing.rcmisfits.org/`). Set them for development. |
+| `sign-in-url` | Where Sign in goes. With no URL, it is a button that only sends the event below. |
+| `sign-out-url` | Where Sign out goes. **Only for a URL that is safe to GET.** A plain link must not be what signs a member out: if your sign-out is a POST or a function call, leave this off and handle `rm-sign-out` (below). With no URL, Sign out is a button that only sends the event. |
+| `forum-url`, `meetings-url`, `tracks-url`, `timing-url` | The four links. Default: the live sites (`https://forum.rcmisfits.org/`, `https://forum.rcmisfits.org/events`, `https://tracks.rcmisfits.org/`, `https://timing.rcmisfits.org/`). Set them for development. |
 
 - **Theme:** it follows the page's (or a parent's) `data-theme`. It has no colours of its own.
 - **Phones (under 640 px):** the links and the account fold into a menu button. Escape, a click outside, or choosing a link closes it.
 - **TypeScript:** `header.d.ts` types `document.querySelector("rm-header")` as `RmHeader`.
-- **Sign in and Sign out** send a bubbling, cancelable `rm-sign-in` / `rm-sign-out` event first. Call `preventDefault()` on it to handle signing in or out yourself (for example with a POST).
+- **Sign in and Sign out** send a bubbling, cancelable `rm-sign-in` / `rm-sign-out` event first. Call `preventDefault()` on it to handle signing in or out yourself.
+- **Sign out by the event, not by a link.** Signing out changes state, so it should be a POST (or the app's own logout call), never a GET that another site could trigger. Leave `sign-out-url` off and listen for `rm-sign-out`, as the examples below do.
 - **URLs** must be `http(s)://`, `//`, or start with `/`, `./`, `../`, `?` or `#`. Anything else (such as `javascript:` or a bare `auth/login`) falls back to the default link, or to a button for Sign in and Sign out.
 - The logo is inlined in `header.js`, so there is no image URL to set up.
 - Changing an attribute re-renders the header (and closes the menu).
@@ -160,12 +162,38 @@ import "@rcmisfits/brand/header.js"; // defines <rm-header>
 **Track Studio (React):**
 
 ```tsx
-<rm-header site="tracks" user={me?.username ?? ""} sign-in-url="/auth/login" sign-out-url="/auth/logout" />
+const header = useRef<HTMLElement>(null);
+
+useEffect(() => {
+  const element = header.current;
+  if (!element) return;
+  const onSignOut = (event: Event) => {
+    event.preventDefault();
+    void logout(); // Track Studio's existing logout() call (a POST)
+  };
+  element.addEventListener("rm-sign-out", onSignOut);
+  return () => element.removeEventListener("rm-sign-out", onSignOut);
+}, []);
+
+<rm-header ref={header} site="tracks" user={me?.username ?? ""} sign-in-url="/auth/login" />;
 ```
 
-React 19 passes these through as attributes. With TypeScript, declare `rm-header` in `JSX.IntrinsicElements`.
+React 19 passes these through as attributes. With TypeScript, declare `rm-header` in `JSX.IntrinsicElements`. There is no `sign-out-url`: Sign out is a button, and the listener signs out with the app's own call.
 
-**The timing site:** `<rm-header site="timing" ...>` in the page shell, with the user from the shared forum sign-in. The box's local screens do not use the forum links, so they do not use this header.
+**The timing site:** `<rm-header site="timing" ...>` in the page shell, with the user from the shared forum sign-in, and no `sign-out-url`. Sign out submits the site's existing sign-out form, so it stays a POST:
+
+```html
+<rm-header site="timing" user="Yeti"></rm-header>
+<form id="sign-out" method="post" action="…" hidden>…</form>
+<script type="module">
+  document.querySelector("rm-header").addEventListener("rm-sign-out", (event) => {
+    event.preventDefault();
+    document.getElementById("sign-out").requestSubmit();
+  });
+</script>
+```
+
+The form is the one the timing site already has (its action and CSRF field stay as they are). The box's local screens do not use the forum links, so they do not use this header.
 
 **The forum (Discourse):** the theme component (a later issue) adds `header.css` to its stylesheet, imports `header.js` in an initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It listens for `rm-sign-out`, calls `preventDefault()`, and uses Discourse's own logout.
 

@@ -2,7 +2,7 @@
 /**
  * The shared top bar used on every RC Misfits site: `<rm-header>`, a framework-free custom element.
  *
- *   <rm-header site="tracks" user="Yeti" sign-out-url="/auth/logout"></rm-header>
+ *   <rm-header site="tracks" user="Yeti"></rm-header>
  *
  * It renders into its own light DOM (no shadow root), styled by `header.css`, which uses only
  * the theme tokens, so it follows the page's `data-theme`. Importing this module defines the element.
@@ -26,7 +26,7 @@ export const SITE_NAMES: Record<SiteId, string> = {
 /** The four links, their labels, the attribute that overrides each URL, and the live URL. */
 export const LINKS: ReadonlyArray<{ id: LinkId; label: string; attribute: string; defaultUrl: string }> = [
   { id: "forum", label: "Forum", attribute: "forum-url", defaultUrl: "https://forum.rcmisfits.org/" },
-  { id: "meetings", label: "Meetings", attribute: "meetings-url", defaultUrl: "https://forum.rcmisfits.org/c/meetings" },
+  { id: "meetings", label: "Meetings", attribute: "meetings-url", defaultUrl: "https://forum.rcmisfits.org/events" },
   { id: "tracks", label: "Tracks", attribute: "tracks-url", defaultUrl: "https://tracks.rcmisfits.org/" },
   { id: "timing", label: "Timing", attribute: "timing-url", defaultUrl: "https://timing.rcmisfits.org/" },
 ];
@@ -129,6 +129,8 @@ let instances = 0;
 /**
  * `<rm-header>`. Sign in and Sign out send a cancelable `rm-sign-in` / `rm-sign-out` event
  * (bubbling) before following their link; an app that calls `preventDefault()` on it handles it itself.
+ * `sign-out-url` is only for a URL that is safe to GET: an app whose sign-out is a POST leaves it off
+ * and handles `rm-sign-out`.
  */
 export class RmHeader extends Base {
   static observedAttributes = ATTRIBUTES;

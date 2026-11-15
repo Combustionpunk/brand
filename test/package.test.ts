@@ -123,3 +123,26 @@ describe("the logo", () => {
     }
   });
 });
+
+describe("the README agrees with the package", () => {
+  const readme = read("README.md");
+  const version = (JSON.parse(read("package.json")) as { version: string }).version;
+
+  it("pins the install line to the package's own version", () => {
+    expect(version).toBe("0.2.0");
+    const pinned = [...readme.matchAll(/pnpm add github:Combustionpunk\/brand#v(\S+)/g)].map((match) => match[1]);
+    expect(pinned).toEqual([version]);
+  });
+
+  it("gives the plugin's meetings page as the default Meetings link", () => {
+    expect(readme).toContain("https://forum.rcmisfits.org/events");
+    expect(readme).not.toContain("/c/meetings");
+  });
+
+  it("never shows sign-out as a plain link: no example sets sign-out-url", () => {
+    const examples = [...readme.matchAll(/<rm-header\b[^>]*>/g)].map((match) => match[0]);
+    expect(examples.length).toBeGreaterThan(3);
+    for (const example of examples) expect(example, example).not.toContain("sign-out-url");
+    expect(readme).toContain("safe to GET");
+  });
+});

@@ -22,7 +22,7 @@ const css = read("src/header/header.css");
 const SITES = ["forum", "tracks", "timing"] as const;
 const LIVE = {
   forum: "https://forum.rcmisfits.org/",
-  meetings: "https://forum.rcmisfits.org/c/meetings",
+  meetings: "https://forum.rcmisfits.org/events",
   tracks: "https://tracks.rcmisfits.org/",
   timing: "https://timing.rcmisfits.org/",
 };
