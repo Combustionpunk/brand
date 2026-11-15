@@ -1,0 +1,17 @@
+{
+  "id": "racing-green-light",
+  "name": "RC Misfits: Racing Green light",
+  "dark": false,
+  "colors": {
+    "primary": "182A20",
+    "secondary": "F5F9F7",
+    "tertiary": "846B1C",
+    "quaternary": "005EB4",
+    "header_background": "FFFFFF",
+    "header_primary": "182A20",
+    "highlight": "846B1C",
+    "danger": "A92116",
+    "success": "1C7E4D",
+    "love": "A92116"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "works-blue-light",
+  "name": "RC Misfits: Works Blue light",
+  "dark": false,
+  "colors": {
+    "primary": "141C2E",
+    "secondary": "F4F6FA",
+    "tertiary": "816901",
+    "quaternary": "B50060",
+    "header_background": "FFFFFF",
+    "header_primary": "141C2E",
+    "highlight": "816901",
+    "danger": "A92116",
+    "success": "1C7B4C",
+    "love": "A92116"
+  }
+}

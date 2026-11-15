@@ -1,0 +1,17 @@
+{
+  "id": "garage",
+  "name": "RC Misfits: Garage",
+  "dark": true,
+  "colors": {
+    "primary": "F3EEE6",
+    "secondary": "1C1A17",
+    "tertiary": "FF6B1A",
+    "quaternary": "7FC3FF",
+    "header_background": "26231F",
+    "header_primary": "F3EEE6",
+    "highlight": "FF6B1A",
+    "danger": "FF5EA1",
+    "success": "6BD38A",
+    "love": "FF5EA1"
+  }
+}

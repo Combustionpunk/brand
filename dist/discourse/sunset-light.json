@@ -1,0 +1,17 @@
+{
+  "id": "sunset-light",
+  "name": "RC Misfits: Sunset light",
+  "dark": false,
+  "colors": {
+    "primary": "291C19",
+    "secondary": "F9F6F6",
+    "tertiary": "996100",
+    "quaternary": "B90040",
+    "header_background": "FFFFFF",
+    "header_primary": "291C19",
+    "highlight": "996100",
+    "danger": "A92116",
+    "success": "1C7B4C",
+    "love": "A92116"
+  }
+}

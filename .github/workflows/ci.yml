@@ -1,0 +1,50 @@
+# Runs on every PR and on main: install, typecheck, tests, build, and a check that the logo
+# masters are untouched. Changes to documentation only (docs/ and Markdown files) are skipped.
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+
+# A newer push to the same PR or branch cancels the run before it.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Typecheck, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The pnpm version comes from "packageManager" in package.json.
+      - uses: pnpm/action-setup@9bbca1e9dc2902adb87e8780fe5c98796985a62d # v6.1.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+      - name: The logo in assets/logo/ is unchanged
+        run: |
+          git diff --exit-code -- assets/logo
+          test -z "$(git status --porcelain -- assets/logo)"

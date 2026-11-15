@@ -1,0 +1,17 @@
+{
+  "id": "synthwave",
+  "name": "RC Misfits: Synthwave",
+  "dark": true,
+  "colors": {
+    "primary": "F7F3FA",
+    "secondary": "140B24",
+    "tertiary": "FF3EA5",
+    "quaternary": "46E5FF",
+    "header_background": "1E1234",
+    "header_primary": "F7F3FA",
+    "highlight": "FF3EA5",
+    "danger": "FF6B5E",
+    "success": "5CF2A6",
+    "love": "FF6B5E"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "@rcmisfits/brand",
+  "version": "0.1.0",
+  "description": "The RC Misfits look: design tokens, the theme generator, fonts and the logo, shared by every app.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "repository": "github:Combustionpunk/brand",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/tokens.css",
+    "./tokens.json": "./tokens.json",
+    "./fonts.css": "./fonts/fonts.css",
+    "./fonts/*": "./fonts/*",
+    "./logo.svg": "./assets/logo/rc-misfits-logo.svg",
+    "./logo.png": "./assets/logo/rc-misfits-logo.png",
+    "./logo-512.png": "./dist/logo/rc-misfits-logo-512.png",
+    "./logo-1024.png": "./dist/logo/rc-misfits-logo-1024.png",
+    "./discourse/*": "./dist/discourse/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "fonts",
+    "assets/logo",
+    "tokens.json"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build.ts",
+    "preview": "node scripts/preview.ts",
+    "check:dist": "pnpm build && git diff --exit-code -- dist"
+  },
+  "packageManager": "pnpm@12.11.2",
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

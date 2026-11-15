@@ -1,0 +1,17 @@
+{
+  "id": "fluoro-light",
+  "name": "RC Misfits: Fluoro light",
+  "dark": false,
+  "colors": {
+    "primary": "22251D",
+    "secondary": "F8F8F7",
+    "tertiary": "6A7500",
+    "quaternary": "B40081",
+    "header_background": "FFFFFF",
+    "header_primary": "22251D",
+    "highlight": "6A7500",
+    "danger": "A92116",
+    "success": "1C7E4D",
+    "love": "A92116"
+  }
+}

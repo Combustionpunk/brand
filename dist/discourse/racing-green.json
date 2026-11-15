@@ -1,0 +1,17 @@
+{
+  "id": "racing-green",
+  "name": "RC Misfits: Racing Green",
+  "dark": true,
+  "colors": {
+    "primary": "F1EFE6",
+    "secondary": "0F1A14",
+    "tertiary": "D4AF37",
+    "quaternary": "8EC9FF",
+    "header_background": "16241C",
+    "header_primary": "F1EFE6",
+    "highlight": "D4AF37",
+    "danger": "FF6B5E",
+    "success": "6FE39A",
+    "love": "FF6B5E"
+  }
+}
