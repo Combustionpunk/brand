@@ -126,6 +126,50 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 
 `dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme. The Discourse theme component is a later issue; it will build its `color_schemes` from these files.
 
+### 9. The shared top bar: `<rm-header>`
+
+One header for every site: the logo, **RC MISFITS** and the site name, **Forum · Meetings · Tracks · Timing** with the current site highlighted, and the username with Sign out, or Sign in. It is a framework-free custom element, so React, plain HTML and Discourse all use it the same way.
+
+```ts
+import "@rcmisfits/brand/fonts.css";
+import "@rcmisfits/brand/tokens.css";
+import "@rcmisfits/brand/header.css";
+import "@rcmisfits/brand/header.js"; // defines <rm-header>
+```
+
+```html
+<rm-header site="tracks" user="Yeti" sign-out-url="/auth/logout"></rm-header>
+```
+
+| Attribute | Meaning |
+|---|---|
+| `site` | `forum`, `tracks` or `timing`: the current site. It is highlighted (`aria-current="page"`) and named after RC MISFITS. Anything else highlights nothing. |
+| `user` | The signed-in username. Empty or missing means signed out. |
+| `sign-in-url`, `sign-out-url` | Where Sign in and Sign out go. With no URL, they are buttons that only send the event below. |
+| `forum-url`, `meetings-url`, `tracks-url`, `timing-url` | The four links. Default: the live sites (`https://forum.rcmisfits.org/`, `https://forum.rcmisfits.org/c/meetings`, `https://tracks.rcmisfits.org/`, `https://timing.rcmisfits.org/`). Set them for development. |
+
+- **Theme:** it follows the page's (or a parent's) `data-theme`. It has no colours of its own.
+- **Phones (under 640 px):** the links and the account fold into a menu button. Escape or a click outside closes it.
+- **Sign in and Sign out** send a bubbling, cancelable `rm-sign-in` / `rm-sign-out` event first. Call `preventDefault()` on it to handle signing in or out yourself (for example with a POST).
+- **Only http(s) and relative URLs** are used. Anything else (such as `javascript:`) falls back to the default, or to a button for sign-in and sign-out.
+- The logo is inlined in `header.js`, so there is no image URL to set up.
+- Changing an attribute re-renders the header (and closes the menu).
+- `renderHeader(options)` (from `header.js`) returns the same markup as a string, for server rendering. The menu button needs the script to work.
+
+**Track Studio (React):**
+
+```tsx
+<rm-header site="tracks" user={me?.username ?? ""} sign-in-url="/auth/login" sign-out-url="/auth/logout" />
+```
+
+React 19 passes these through as attributes. With TypeScript, declare `rm-header` in `JSX.IntrinsicElements`.
+
+**The timing site:** `<rm-header site="timing" ...>` in the page shell, with the user from the shared forum sign-in. The box's local screens do not use the forum links, so they do not use this header.
+
+**The forum (Discourse):** the theme component (a later issue) adds `header.css` to its stylesheet, imports `header.js` in an initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It listens for `rm-sign-out`, calls `preventDefault()`, and uses Discourse's own logout.
+
+`pnpm preview` also writes `preview/header.html` (choose a theme with `?theme=synthwave`).
+
 ## The themes
 
 | id | Name | Mode | Pair |
@@ -264,7 +308,7 @@ Node 24, pnpm, TypeScript, Vitest.
 | `pnpm typecheck` | Type-checks `src`, `scripts` and `test`. |
 | `pnpm test` | Runs the tests, including the contrast checks for every theme and for generator output. |
 | `pnpm build` | Writes `dist/` from `tokens.json` and `src/`. |
-| `pnpm preview` | Writes `preview/index.html`: every theme's swatches, a top bar, a practice table and buttons. Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
+| `pnpm preview` | Writes `preview/index.html` (every theme's swatches, a top bar, a practice table and buttons) and `preview/header.html` (`<rm-header>` per site). Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
 | `pnpm check:dist` | Builds, then fails if the committed `dist/` was out of date. |
 
 - **`tokens.json` is the single source.** Change it, then run `pnpm build` and commit `dist/` with it. A test fails if `dist/tokens.css` or the Discourse schemes do not match `tokens.json`.
