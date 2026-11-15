@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import type { ThemeKey } from "./types.js";
 /** The sites that can be the current one. */
 export type SiteId = "forum" | "tracks" | "timing";
@@ -50,7 +51,12 @@ export declare class RmHeader extends Base {
     static observedAttributes: string[];
     connectedCallback(): void;
     disconnectedCallback(): void;
-    attributeChangedCallback(): void;
+    attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void;
+}
+declare global {
+    interface HTMLElementTagNameMap {
+        "rm-header": RmHeader;
+    }
 }
 /** Registers `<rm-header>`, once. Importing this module already does this in a browser. */
 export declare function defineHeader(): void;

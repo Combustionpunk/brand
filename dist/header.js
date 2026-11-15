@@ -56,16 +56,23 @@ var RmHeader = class extends Base {
   #wide = null;
   #onClick = (event) => {
     const target = event.target instanceof Element ? event.target : null;
-    if (target?.closest(".rm-header__menu")) {
+    const inside = (selector) => {
+      const match = target?.closest(selector);
+      return match && this.contains(match) ? match : null;
+    };
+    if (inside(".rm-header__menu")) {
       this.#setOpen(!this.hasAttribute("data-open"));
       return;
     }
-    const action = target?.closest("[data-action]")?.dataset["action"];
+    const action = inside("[data-action]")?.dataset["action"];
     if (action === "sign-in" || action === "sign-out") {
       const proceed = this.dispatchEvent(new CustomEvent(`rm-${action}`, { bubbles: true, cancelable: true, composed: true }));
       if (!proceed) {
         event.preventDefault();
       }
+    }
+    if (action || inside("a[href]")) {
+      this.#setOpen(false);
     }
   };
   #onDocumentClick = (event) => {
@@ -75,9 +82,11 @@ var RmHeader = class extends Base {
   };
   #onKeydown = (event) => {
     if (event.key === "Escape" && this.hasAttribute("data-open")) {
-      event.preventDefault();
       this.#setOpen(false);
-      this.querySelector(".rm-header__menu")?.focus();
+      if (document.activeElement && this.contains(document.activeElement)) {
+        event.preventDefault();
+        this.querySelector(".rm-header__menu")?.focus();
+      }
     }
   };
   #onWide = (event) => {
@@ -100,8 +109,8 @@ var RmHeader = class extends Base {
     this.#wide?.removeEventListener?.("change", this.#onWide);
     this.#wide = null;
   }
-  attributeChangedCallback() {
-    if (this.isConnected) {
+  attributeChangedCallback(_name, oldValue, newValue) {
+    if (this.isConnected && oldValue !== newValue) {
       this.#render();
     }
   }
@@ -110,6 +119,8 @@ var RmHeader = class extends Base {
     this.querySelector(".rm-header__menu")?.setAttribute("aria-expanded", String(open));
   }
   #render() {
+    const focused = document.activeElement instanceof HTMLElement && this.contains(document.activeElement) ? document.activeElement : null;
+    const key = focused?.dataset["link"] ? `[data-link="${focused.dataset["link"]}"]` : focused?.dataset["action"] ? "[data-action]" : focused?.matches(".rm-header__brand, .rm-header__menu") ? `.${focused.className}` : null;
     this.removeAttribute("data-open");
     this.innerHTML = renderHeader({
       site: this.getAttribute("site"),
@@ -119,6 +130,9 @@ var RmHeader = class extends Base {
       urls: Object.fromEntries(LINKS.map((link) => [link.id, this.getAttribute(link.attribute)])),
       menuId: this.#menuId
     });
+    if (key) {
+      this.querySelector(key)?.focus();
+    }
   }
 };
 function defineHeader() {

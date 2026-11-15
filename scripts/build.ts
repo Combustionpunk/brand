@@ -87,7 +87,8 @@ try {
   }
   // The header's declarations sit one folder down in src/, but next to index.d.ts in dist/.
   const header = readFileSync(join(types, "src/header/header.d.ts"), "utf8");
-  writeFileSync(join(dist, "header.d.ts"), header.replace(/(["'])\.\.\/([^"']+)\.ts\1/g, "$1./$2.js$1"));
+  // tsc drops the source's DOM lib reference, which the declarations need.
+  writeFileSync(join(dist, "header.d.ts"), '/// <reference lib="dom" />\n' + header.replace(/(["'])\.\.\/([^"']+)\.ts\1/g, "$1./$2.js$1"));
 } finally {
   rmSync(types, { recursive: true, force: true });
 }

@@ -138,16 +138,24 @@ export class RmHeader extends Base {
 
   #onClick = (event: MouseEvent) => {
     const target = event.target instanceof Element ? event.target : null;
-    if (target?.closest(".rm-header__menu")) {
+    const inside = (selector: string) => {
+      const match = target?.closest<HTMLElement>(selector);
+      return match && this.contains(match) ? match : null;
+    };
+    if (inside(".rm-header__menu")) {
       this.#setOpen(!this.hasAttribute("data-open"));
       return;
     }
-    const action = target?.closest<HTMLElement>("[data-action]")?.dataset["action"];
+    const action = inside("[data-action]")?.dataset["action"];
     if (action === "sign-in" || action === "sign-out") {
       const proceed = this.dispatchEvent(new CustomEvent(`rm-${action}`, { bubbles: true, cancelable: true, composed: true }));
       if (!proceed) {
         event.preventDefault();
       }
+    }
+    // Choosing a link or Sign in / Sign out folds the menu away.
+    if (action || inside("a[href]")) {
+      this.#setOpen(false);
     }
   };
 
@@ -159,9 +167,12 @@ export class RmHeader extends Base {
 
   #onKeydown = (event: KeyboardEvent) => {
     if (event.key === "Escape" && this.hasAttribute("data-open")) {
-      event.preventDefault();
       this.#setOpen(false);
-      this.querySelector<HTMLButtonElement>(".rm-header__menu")?.focus();
+      // Only take the key, and focus, when the user was in the header: an app's dialog keeps its own Escape.
+      if (document.activeElement && this.contains(document.activeElement)) {
+        event.preventDefault();
+        this.querySelector<HTMLButtonElement>(".rm-header__menu")?.focus();
+      }
     }
   };
 
@@ -188,8 +199,8 @@ export class RmHeader extends Base {
     this.#wide = null;
   }
 
-  attributeChangedCallback(): void {
-    if (this.isConnected) {
+  attributeChangedCallback(_name: string, oldValue: string | null, newValue: string | null): void {
+    if (this.isConnected && oldValue !== newValue) {
       this.#render();
     }
   }
@@ -200,6 +211,15 @@ export class RmHeader extends Base {
   }
 
   #render(): void {
+    // Re-rendering replaces the markup, so note which control had focus and give it back.
+    const focused = document.activeElement instanceof HTMLElement && this.contains(document.activeElement) ? document.activeElement : null;
+    const key = focused?.dataset["link"]
+      ? `[data-link="${focused.dataset["link"]}"]`
+      : focused?.dataset["action"]
+        ? "[data-action]"
+        : focused?.matches(".rm-header__brand, .rm-header__menu")
+          ? `.${focused.className}`
+          : null;
     this.removeAttribute("data-open");
     this.innerHTML = renderHeader({
       site: this.getAttribute("site"),
@@ -209,6 +229,15 @@ export class RmHeader extends Base {
       urls: Object.fromEntries(LINKS.map((link) => [link.id, this.getAttribute(link.attribute)])),
       menuId: this.#menuId,
     });
+    if (key) {
+      this.querySelector<HTMLElement>(key)?.focus();
+    }
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "rm-header": RmHeader;
   }
 }
 

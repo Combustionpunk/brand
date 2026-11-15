@@ -235,6 +235,78 @@ describe("<rm-header>: the menu on a phone", () => {
     expect(button(header).getAttribute("aria-expanded")).toBe("false");
   });
 
+  it("on Escape with focus elsewhere on the page, closes but leaves focus and the key alone", () => {
+    const header = mount({});
+    const input = document.createElement("input");
+    document.body.append(input);
+    button(header).click();
+    input.focus();
+    const escape = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+    input.dispatchEvent(escape);
+    expect(button(header).getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(input);
+    expect(escape.defaultPrevented).toBe(false);
+  });
+
+  it("closes when a link or Sign in in the panel is chosen", () => {
+    const header = mount({});
+    header.addEventListener("rm-sign-in", (event) => event.preventDefault());
+    button(header).click();
+    q(header, ".rm-header__account button").click();
+    expect(button(header).getAttribute("aria-expanded")).toBe("false");
+    button(header).click();
+    const link = navLinks(header)[0]!;
+    link.addEventListener("click", (event) => event.preventDefault());
+    link.click();
+    expect(header.hasAttribute("data-open")).toBe(false);
+  });
+
+  it("closes when the screen widens past the phone breakpoint", () => {
+    const listeners: Array<(event: { matches: boolean }) => void> = [];
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: (_: string, listener: (event: { matches: boolean }) => void) => listeners.push(listener),
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia;
+    try {
+      const header = mount({});
+      button(header).click();
+      for (const listener of listeners) listener({ matches: true });
+      expect(button(header).getAttribute("aria-expanded")).toBe("false");
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it("ignores data-action on the page around it", () => {
+    const wrapper = document.createElement("div");
+    wrapper.dataset["action"] = "sign-out";
+    document.body.append(wrapper);
+    const header = document.createElement("rm-header");
+    wrapper.append(header);
+    let events = 0;
+    document.addEventListener("rm-sign-out", () => events++);
+    q(header, "nav").click();
+    expect(events).toBe(0);
+  });
+
+  it("keeps focus on the same control when an attribute changes", () => {
+    const header = mount({ site: "forum" });
+    navLinks(header)[2]!.focus();
+    header.setAttribute("user", "Yeti");
+    expect(document.activeElement).toBe(navLinks(header)[2]);
+    expect(document.activeElement?.isConnected).toBe(true);
+  });
+
+  it("does not re-render when an attribute is set to the same value", () => {
+    const header = mount({ site: "forum" });
+    const before = q(header, ".rm-header");
+    header.setAttribute("site", "forum");
+    expect(q(header, ".rm-header")).toBe(before);
+  });
+
   it("closes on a click outside it, and when it is removed it stops listening", () => {
     const header = mount({});
     button(header).click();
@@ -262,6 +334,13 @@ describe("<rm-header>: accessible", () => {
   it("has a labelled nav", () => {
     const header = mount({ site: "forum" });
     expect(q(header, "nav").getAttribute("aria-label")).toBe("RC Misfits sites");
+  });
+
+  it("styles its links strongly enough that a host page's a:link / a:visited does not win", () => {
+    // Each rule that sets a link's colour has at least two classes, or a class and two elements.
+    for (const selector of [".rm-header nav a {", ".rm-header .rm-header__account a,", ".rm-header .rm-header__brand {"]) {
+      expect(css).toContain(selector);
+    }
   });
 
   it("shows focus with a visible outline", () => {
@@ -347,6 +426,10 @@ describe("the built header", () => {
     expect(built.renderHeader({ site: "tracks", user: "Yeti", menuId: "m" })).toBe(
       renderHeader({ site: "tracks", user: "Yeti", menuId: "m" }),
     );
-    expect(read("dist/header.d.ts")).toContain("renderHeader");
+    const types = read("dist/header.d.ts");
+    expect(types).toContain("renderHeader");
+    // It uses DOM types, and tells TypeScript what document.querySelector("rm-header") returns.
+    expect(types.startsWith('/// <reference lib="dom" />')).toBe(true);
+    expect(types).toMatch(/interface HTMLElementTagNameMap \{\s*"rm-header": RmHeader;/);
   });
 });

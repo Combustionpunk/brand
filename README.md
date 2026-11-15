@@ -149,9 +149,10 @@ import "@rcmisfits/brand/header.js"; // defines <rm-header>
 | `forum-url`, `meetings-url`, `tracks-url`, `timing-url` | The four links. Default: the live sites (`https://forum.rcmisfits.org/`, `https://forum.rcmisfits.org/c/meetings`, `https://tracks.rcmisfits.org/`, `https://timing.rcmisfits.org/`). Set them for development. |
 
 - **Theme:** it follows the page's (or a parent's) `data-theme`. It has no colours of its own.
-- **Phones (under 640 px):** the links and the account fold into a menu button. Escape or a click outside closes it.
+- **Phones (under 640 px):** the links and the account fold into a menu button. Escape, a click outside, or choosing a link closes it.
+- **TypeScript:** `header.d.ts` types `document.querySelector("rm-header")` as `RmHeader`.
 - **Sign in and Sign out** send a bubbling, cancelable `rm-sign-in` / `rm-sign-out` event first. Call `preventDefault()` on it to handle signing in or out yourself (for example with a POST).
-- **Only http(s) and relative URLs** are used. Anything else (such as `javascript:`) falls back to the default, or to a button for sign-in and sign-out.
+- **URLs** must be `http(s)://`, `//`, or start with `/`, `./`, `../`, `?` or `#`. Anything else (such as `javascript:` or a bare `auth/login`) falls back to the default link, or to a button for Sign in and Sign out.
 - The logo is inlined in `header.js`, so there is no image URL to set up.
 - Changing an attribute re-renders the header (and closes the menu).
 - `renderHeader(options)` (from `header.js`) returns the same markup as a string, for server rendering. The menu button needs the script to work.

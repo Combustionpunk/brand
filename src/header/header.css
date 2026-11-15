@@ -45,7 +45,7 @@ rm-header {
 }
 
 /* The logo and wordmark: always visible. */
-.rm-header__brand {
+.rm-header .rm-header__brand {
   gap: var(--rm-space-3);
   flex: none;
   color: var(--rm-text);
@@ -149,8 +149,8 @@ rm-header {
   white-space: nowrap;
 }
 
-.rm-header__account a,
-.rm-header__account button {
+.rm-header .rm-header__account a,
+.rm-header .rm-header__account button {
   justify-content: center;
   margin: 0;
   padding: 0 var(--rm-space-2);
