@@ -78,7 +78,7 @@ describe("<rm-header>: rendering per site", () => {
   });
 
   it("with no site, or an unknown one, highlights nothing and shows no site name", () => {
-    for (const attributes of [{}, { site: "meetings" }, { site: "nope" }]) {
+    for (const attributes of [{}, { site: "meetings" }, { site: "nope" }] as Record<string, string>[]) {
       const header = mount(attributes);
       expect(header.querySelector("[aria-current]")).toBeNull();
       expect(header.querySelector(".rm-header__site")).toBeNull();
