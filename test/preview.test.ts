@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { renderHeaderPreview } from "../scripts/header-preview-html.ts";
 import { EXAMPLES, renderPreview } from "../scripts/preview-html.ts";
 import { themeIds, themes } from "../src/tokens.ts";
 import { THEME_KEYS } from "../src/types.ts";
@@ -33,5 +34,22 @@ describe("the preview page", () => {
     expect(html).toContain('href="../dist/tokens.css"');
     expect(html).toContain('href="../fonts/fonts.css"');
     expect(html).toContain('class="rm-figures num');
+  });
+});
+
+describe("the header preview page", () => {
+  const page = renderHeaderPreview();
+
+  it("loads the built header, tokens and fonts, as an app would", () => {
+    for (const href of ["../fonts/fonts.css", "../dist/tokens.css", "../dist/header.css"]) {
+      expect(page).toContain(`href="${href}"`);
+    }
+    expect(page).toContain('<script type="module" src="../dist/header.js"></script>');
+  });
+
+  it("shows each site, signed in and out", () => {
+    expect(page).toContain('<rm-header site="tracks" user="Yeti"');
+    expect(page).toContain('<rm-header site="timing" sign-in-url="#">');
+    expect(page).toContain('<rm-header site="forum" user="Marshal"');
   });
 });

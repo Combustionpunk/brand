@@ -1,13 +1,14 @@
 {
   "name": "@rcmisfits/brand",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The RC Misfits look: design tokens, the theme generator, fonts and the logo, shared by every app.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
   "repository": "github:Combustionpunk/brand",
   "sideEffects": [
-    "*.css"
+    "*.css",
+    "./dist/header.js"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,6 +19,11 @@
     },
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./tokens.json",
+    "./header.js": {
+      "types": "./dist/header.d.ts",
+      "default": "./dist/header.js"
+    },
+    "./header.css": "./dist/header.css",
     "./fonts.css": "./fonts/fonts.css",
     "./fonts/*": "./fonts/*",
     "./logo.svg": "./assets/logo/rc-misfits-logo.svg",
@@ -44,6 +50,7 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "esbuild": "^0.28.2",
+    "happy-dom": "^21.0.4",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"

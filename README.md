@@ -12,7 +12,7 @@ The one source of the RC Misfits look: design tokens, the theme generator, fonts
 ### 1. Install, pinned to a tag
 
 ```sh
-pnpm add github:Combustionpunk/brand#v0.1.0
+pnpm add github:Combustionpunk/brand#v0.2.0
 ```
 
 - The package name is `@rcmisfits/brand`.
@@ -125,6 +125,79 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 ### 8. The forum (Discourse)
 
 `dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme. The Discourse theme component is a later issue; it will build its `color_schemes` from these files.
+
+### 9. The shared top bar: `<rm-header>`
+
+One header for every site: the logo, **RC MISFITS** and the site name, **Forum · Meetings · Tracks · Timing** with the current site highlighted, and the username with Sign out, or Sign in. It is a framework-free custom element, so React, plain HTML and Discourse all use it the same way.
+
+```ts
+import "@rcmisfits/brand/fonts.css";
+import "@rcmisfits/brand/tokens.css";
+import "@rcmisfits/brand/header.css";
+import "@rcmisfits/brand/header.js"; // defines <rm-header>
+```
+
+```html
+<rm-header site="tracks" user="Yeti"></rm-header>
+```
+
+| Attribute | Meaning |
+|---|---|
+| `site` | `forum`, `tracks` or `timing`: the current site. It is highlighted (`aria-current="page"`) and named after RC MISFITS. Anything else highlights nothing. |
+| `user` | The signed-in username. Empty or missing means signed out. |
+| `sign-in-url` | Where Sign in goes. With no URL, it is a button that only sends the event below. |
+| `sign-out-url` | Where Sign out goes. **Only for a URL that is safe to GET.** A plain link must not be what signs a member out: if your sign-out is a POST or a function call, leave this off and handle `rm-sign-out` (below). With no URL, Sign out is a button that only sends the event. |
+| `forum-url`, `meetings-url`, `tracks-url`, `timing-url` | The four links. Default: the live sites (`https://forum.rcmisfits.org/`, `https://forum.rcmisfits.org/events`, `https://tracks.rcmisfits.org/`, `https://timing.rcmisfits.org/`). Set them for development. |
+
+- **Theme:** it follows the page's (or a parent's) `data-theme`. It has no colours of its own.
+- **Phones (under 640 px):** the links and the account fold into a menu button. Escape, a click outside, or choosing a link closes it.
+- **TypeScript:** `header.d.ts` types `document.querySelector("rm-header")` as `RmHeader`.
+- **Sign in and Sign out** send a bubbling, cancelable `rm-sign-in` / `rm-sign-out` event first. Call `preventDefault()` on it to handle signing in or out yourself.
+- **Sign out by the event, not by a link.** Signing out changes state, so it should be a POST (or the app's own logout call), never a GET that another site could trigger. Leave `sign-out-url` off and listen for `rm-sign-out`, as the examples below do.
+- **URLs** must be `http(s)://`, `//`, or start with `/`, `./`, `../`, `?` or `#`. Anything else (such as `javascript:` or a bare `auth/login`) falls back to the default link, or to a button for Sign in and Sign out.
+- The logo is inlined in `header.js`, so there is no image URL to set up.
+- Changing an attribute re-renders the header (and closes the menu).
+- `renderHeader(options)` (from `header.js`) returns the same markup as a string, for server rendering. The menu button needs the script to work.
+
+**Track Studio (React):**
+
+```tsx
+const header = useRef<HTMLElement>(null);
+
+useEffect(() => {
+  const element = header.current;
+  if (!element) return;
+  const onSignOut = (event: Event) => {
+    event.preventDefault();
+    void logout(); // Track Studio's existing logout() call (a POST)
+  };
+  element.addEventListener("rm-sign-out", onSignOut);
+  return () => element.removeEventListener("rm-sign-out", onSignOut);
+}, []);
+
+<rm-header ref={header} site="tracks" user={me?.username ?? ""} sign-in-url="/auth/login" />;
+```
+
+React 19 passes these through as attributes. With TypeScript, declare `rm-header` in `JSX.IntrinsicElements`. There is no `sign-out-url`: Sign out is a button, and the listener signs out with the app's own call.
+
+**The timing site:** `<rm-header site="timing" ...>` in the page shell, with the user from the shared forum sign-in, and no `sign-out-url`. Sign out submits the site's existing sign-out form, so it stays a POST:
+
+```html
+<rm-header site="timing" user="Yeti"></rm-header>
+<form id="sign-out" method="post" action="…" hidden>…</form>
+<script type="module">
+  document.querySelector("rm-header").addEventListener("rm-sign-out", (event) => {
+    event.preventDefault();
+    document.getElementById("sign-out").requestSubmit();
+  });
+</script>
+```
+
+The form is the one the timing site already has (its action and CSRF field stay as they are). The box's local screens do not use the forum links, so they do not use this header.
+
+**The forum (Discourse):** the theme component (a later issue) adds `header.css` to its stylesheet, imports `header.js` in an initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It listens for `rm-sign-out`, calls `preventDefault()`, and uses Discourse's own logout.
+
+`pnpm preview` also writes `preview/header.html` (choose a theme with `?theme=synthwave`).
 
 ## The themes
 
@@ -264,7 +337,7 @@ Node 24, pnpm, TypeScript, Vitest.
 | `pnpm typecheck` | Type-checks `src`, `scripts` and `test`. |
 | `pnpm test` | Runs the tests, including the contrast checks for every theme and for generator output. |
 | `pnpm build` | Writes `dist/` from `tokens.json` and `src/`. |
-| `pnpm preview` | Writes `preview/index.html`: every theme's swatches, a top bar, a practice table and buttons. Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
+| `pnpm preview` | Writes `preview/index.html` (every theme's swatches, a top bar, a practice table and buttons) and `preview/header.html` (`<rm-header>` per site). Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
 | `pnpm check:dist` | Builds, then fails if the committed `dist/` was out of date. |
 
 - **`tokens.json` is the single source.** Change it, then run `pnpm build` and commit `dist/` with it. A test fails if `dist/tokens.css` or the Discourse schemes do not match `tokens.json`.

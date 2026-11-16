@@ -12,6 +12,7 @@ const read = (path: string) => readFileSync(resolve(root, path), "utf8");
 const pkg = JSON.parse(read("package.json")) as {
   name: string;
   files: string[];
+  sideEffects: string[];
   exports: Record<string, string | { types: string; default: string }>;
 };
 
@@ -34,6 +35,12 @@ describe("the package", () => {
     }
     expect(pkg.exports["./tokens.css"]).toBe("./dist/tokens.css");
     expect(pkg.exports["./logo.svg"]).toBe("./assets/logo/rc-misfits-logo.svg");
+    expect(pkg.exports["./header.js"]).toEqual({ types: "./dist/header.d.ts", default: "./dist/header.js" });
+    expect(pkg.exports["./header.css"]).toBe("./dist/header.css");
+  });
+
+  it("keeps header.js's side effect (it defines <rm-header>) from being tree-shaken", () => {
+    expect(pkg.sideEffects).toEqual(expect.arrayContaining(["*.css", "./dist/header.js"]));
   });
 });
 
@@ -114,5 +121,28 @@ describe("the logo", () => {
       const actual = createHash("sha256").update(readFileSync(resolve(root, path))).digest("hex");
       expect(actual, path).toBe(hash);
     }
+  });
+});
+
+describe("the README agrees with the package", () => {
+  const readme = read("README.md");
+  const version = (JSON.parse(read("package.json")) as { version: string }).version;
+
+  it("pins the install line to the package's own version", () => {
+    expect(version).toBe("0.2.0");
+    const pinned = [...readme.matchAll(/pnpm add github:Combustionpunk\/brand#v(\S+)/g)].map((match) => match[1]);
+    expect(pinned).toEqual([version]);
+  });
+
+  it("gives the plugin's meetings page as the default Meetings link", () => {
+    expect(readme).toContain("https://forum.rcmisfits.org/events");
+    expect(readme).not.toContain("/c/meetings");
+  });
+
+  it("never shows sign-out as a plain link: no example sets sign-out-url", () => {
+    const examples = [...readme.matchAll(/<rm-header\b[^>]*>/g)].map((match) => match[0]);
+    expect(examples.length).toBeGreaterThan(3);
+    for (const example of examples) expect(example, example).not.toContain("sign-out-url");
+    expect(readme).toContain("safe to GET");
   });
 });
