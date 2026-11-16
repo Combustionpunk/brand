@@ -1,16 +1,22 @@
-# The forum's theme component: install, update, defaults, roll back
+# The forum's theme: install, update, defaults, roll back
 
-The RC Misfits look on the forum (Discourse) is a **theme component** built from this repo. `pnpm build` writes it into [`discourse/`](../discourse/). Never edit that folder by hand.
+The RC Misfits look on the forum (Discourse) is a **Discourse theme** built from this repo. `pnpm build` writes it into [`discourse/`](../discourse/). Never edit that folder by hand.
+
+**A full theme, not a component.** Issue #3 asked for a theme component. But Discourse imports `color_schemes` only from a full theme: `RemoteTheme#update_theme` runs `update_theme_color_schemes(...) unless theme.component`. A component would install with no colour schemes at all. So `about.json` has `"component": false`, and the forum uses **RC Misfits** as its site theme (built on Discourse's core styles), in place of Foundation or Horizon.
 
 ## What it does
 
-- **Colour schemes:** every theme in `tokens.json` becomes a Discourse colour scheme, named `RC Misfits: <theme>`. Pit Lane comes first and Pit Lane light second.
+- **Colour schemes:** every theme in `tokens.json` becomes a Discourse colour palette, named `RC Misfits: <theme>`. Pit Lane comes first and Pit Lane light second.
+- **The modifier `only_theme_color_schemes`** does two things:
+  - members are offered exactly these palettes, all of them, with no "Users can select" box to tick;
+  - on a new install, Discourse makes the first dark palette (Pit Lane) the dark default and the first light one (Pit Lane light) the light default.
+  - It needs a Discourse from 2026 (the modifier came in March 2026). An older Discourse ignores it: then set the defaults and tick "Users can select" by hand (below).
 - **The shared top bar:** `<rm-header site="forum">` sits above Discourse's own header, which keeps search, the sidebar, notifications and the user menu. Discourse's own logo is hidden, because the top bar carries it.
   - Sign in opens Discourse's login, and Sign out uses Discourse's own logout (a DELETE of the session). Neither is a GET link.
-  - **Forum** goes to `/` and **Meetings** goes to `/events` on the forum the member is on. **Tracks** and **Timing** go to the live sites unless the component's settings `tracks_url` and `timing_url` say otherwise. Set those on the dev forum.
-- **The header follows the member's scheme.** The component reads Discourse's live colours. If they are exactly a brand theme, it sets `data-rm-theme="<id>"` on `<html>`, so every `--rm-*` token is that theme's. For a scheme that is not a brand theme (one an admin made or edited), the `--rm-*` colours fall back to Discourse's own colour variables.
+  - **Forum** goes to `/` and **Meetings** goes to `/events` on the forum the member is on. **Tracks** and **Timing** go to the live sites unless the theme's settings `tracks_url` and `timing_url` say otherwise. Set those on the dev forum.
+- **The header follows the member's scheme.** The theme's script reads Discourse's live colours. If they are exactly a brand theme, it sets `data-rm-theme="<id>"` on `<html>`, so every `--rm-*` token is that theme's. For a scheme that is not a brand theme (one an admin made or edited), the `--rm-*` colours fall back to Discourse's own colour variables.
   - The forum uses `data-rm-theme`, not `data-theme`, to keep clear of Discourse's own `data-theme-id` and of other components that may set `data-theme`.
-- **Fonts:** Oswald (headings) and Inter (body) are uploaded with the component as theme assets, so nothing loads from Google. Discourse's `--font-family` and `--heading-font-family` point at them.
+- **Fonts:** Oswald (headings) and Inter (body) are uploaded with the theme as theme assets, so nothing loads from Google. Discourse's `--font-family` and `--heading-font-family` point at them.
 - **Figures:** counts, dates, badges, tables in posts and `.rm-figures` use tabular figures.
 
 ## Where Discourse installs it from
@@ -30,7 +36,7 @@ The RC Misfits look on the forum (Discourse) is a **theme component** built from
    ```
 
    `git subtree split` gives the same commits each time for the same history, so a normal push fast-forwards. The `discourse-vX.Y.Z` tags are for rolling back (below). A CI job on each `v*` tag could do this later; for now it is manual, because agents never push anything but PR branches.
-2. **A separate public repo** (for example `Combustionpunk/rcmisfits-discourse`) holding a copy of `discourse/`, updated the same way. This is how most Discourse components are published, but it is a second repo to keep in step.
+2. **A separate public repo** (for example `Combustionpunk/rcmisfits-discourse`) holding a copy of `discourse/`, updated the same way. This is how most Discourse themes are published, but it is a second repo to keep in step.
 3. **Upload** (no git): zip the folder (`cd discourse && zip -r ../rcmisfits-discourse.zip .`) and use **Install › From your device**. It works today, with no Board decision, but the forum cannot pull updates; every update is a new upload.
 
 The steps below assume option 1. For option 2, use that repo's URL and leave the branch empty.
@@ -41,12 +47,13 @@ The steps below assume option 1. For option 2, use that repo's URL and leave the
    - URL: `https://github.com/Combustionpunk/brand`
    - Branch: `discourse-theme`
    - It is public, so no private key is needed.
-2. Discourse lists it as a **component** named **RC Misfits**. Add it to the site's theme: open the theme (Foundation, Horizon or whichever the forum uses) and add **RC Misfits** under **Included components**.
-3. On the dev forum, set the component's settings `tracks_url` and `timing_url` to the dev sites.
+2. Discourse lists it as a theme named **RC Misfits**. Before going on, note which theme is the site default now (for rolling back).
+3. Open **RC Misfits** and choose **Set as default** (the wording varies by version). Any components the forum uses have to be added to RC Misfits under **Included components**, as they were on the old theme. Check the list on the old theme first.
+4. On the dev forum, set the theme's settings `tracks_url` and `timing_url` to the dev sites.
 
 ## Set the defaults
 
-On the forum's theme (not the component):
+On a current Discourse, the install has already done this (see the modifier above). Check it on **RC Misfits**:
 
 | Theme setting | Choose | Why |
 |---|---|---|
@@ -60,30 +67,27 @@ This is the brand's own rule (README, "Choose the theme"): Pit Lane, or Pit Lane
 
 ### Let members choose (Preferences › Interface)
 
-Discourse does not let `about.json` mark a scheme as selectable, so an admin does this once per scheme:
+On a current Discourse, the modifier already offers every `RC Misfits: …` palette, and only those, under **Preferences › Interface**. Members pick a light and a dark palette there, and the top bar follows whichever is showing.
 
-1. **Admin › Appearance › Color palettes**, open each `RC Misfits: …` palette.
-2. Tick **Users can select** (the label may be "Show on user preferences" or similar, depending on the version).
-
-Members then pick a light and a dark scheme under **Preferences › Interface**. The top bar follows whichever is showing.
+On an older Discourse (no `only_theme_color_schemes`), an admin does it once per palette: **Admin › Appearance › Color palettes**, open each `RC Misfits: …` palette and tick **Users can select**.
 
 ## Update
 
 - **Admin › Appearance › Themes and components › RC Misfits › Check for updates**, then **Update to latest**. Discourse pulls the `discourse-theme` branch again.
-- Colour schemes from the component are updated in place. A scheme that is no longer in `about.json` is deleted.
-- If an admin edited a scheme's colours on the forum, an update overwrites them. Colours are changed in `tokens.json`, by the Board, never on the forum.
+- Palettes from the theme are updated in place. A scheme that is no longer in `about.json` is deleted.
+- If an admin edits a palette on the forum, Discourse turns it into a separate copy, and updates no longer reach that copy. Don't edit the palettes on the forum: colours are changed in `tokens.json`, by the Board. (An edited palette also stops matching a brand theme, so the top bar falls back to Discourse's colours.)
 
 ## Roll back
 
-- **Fast, no git:** remove **RC Misfits** from the theme's included components (or disable it). The forum is back to Discourse's own header and fonts at once. Set the theme's palettes back to what they were (note them before installing).
-- **To an earlier version:** Discourse keeps no history of a component. Delete **RC Misfits**, then install it again with the branch set to an earlier tag, for example `discourse-v0.2.0`. (`git clone --branch` takes a tag as well as a branch.) It stays on that tag until it is reinstalled from `discourse-theme`.
-- Deleting the component also deletes its colour schemes. Members who chose one go back to the theme's default palette.
+- **Fast, no git:** make the old theme the default again (**Set as default** on it). The forum is back to its old header, fonts and palettes at once. Members' palette choices are kept, and come back if RC Misfits is made the default again.
+- **To an earlier version:** Discourse keeps no history of a theme. Delete **RC Misfits**, then install it again with the branch set to an earlier tag, for example `discourse-v0.2.0`. (`git clone --branch` takes a tag as well as a branch.) It stays on that tag until it is reinstalled from `discourse-theme`.
+- Deleting the theme also deletes its palettes, and reinstalling makes new ones. Members who chose a palette go back to the default, and have to choose again.
 
 ## Test on the dev forum (discourse-dev, CT 101)
 
 Before live, on the dev forum:
 
-1. Install, add to the theme, and set the defaults as above.
+1. Install, make RC Misfits the default theme, and check the defaults as above.
 2. Signed out: the top bar shows **Sign in**, the forum is Pit Lane (or Pit Lane light on a light device), and the headings are Oswald.
 3. Sign in: the top bar shows the username. Search, notifications and the user menu still work.
 4. In Preferences › Interface, choose Synthwave: the forum and the top bar both turn Synthwave.

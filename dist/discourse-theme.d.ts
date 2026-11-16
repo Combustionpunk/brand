@@ -26,14 +26,23 @@ export interface FontAsset {
 export declare function fontAssets(fontsCss: string): FontAsset[];
 export interface AboutJson {
     name: string;
-    component: true;
+    component: false;
     about_url: string;
     license_url: string;
     authors: string;
     assets: Record<string, string>;
+    modifiers: {
+        only_theme_color_schemes: true;
+    };
     color_schemes: Record<string, Record<DiscourseColourName, string>>;
 }
-/** The component's `about.json`. */
+/**
+ * The theme's `about.json`.
+ *
+ * `only_theme_color_schemes` makes Discourse offer members exactly this theme's schemes (all of
+ * them, with no "Users can select" box to tick), and on a new install take the first dark scheme
+ * (Pit Lane) as the dark default and the first light one (Pit Lane light) as the light default.
+ */
 export declare function renderAboutJson(tokens: Tokens, fontsCss: string): AboutJson;
 /** The component's `common/common.scss`: fonts, tokens, the header's CSS and Discourse's fonts and figures. */
 export declare function renderThemeScss(tokens: Tokens, fontsCss: string, headerCss: string): string;

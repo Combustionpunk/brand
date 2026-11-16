@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 /**
- * The forum component's script, bundled into discourse/javascripts/discourse/lib/rm-brand.js.
+ * The forum theme's script, bundled into discourse/javascripts/discourse/lib/rm-brand.js.
  * Importing it defines <rm-header>.
  */
 import { defineHeader } from "../header/header.ts";

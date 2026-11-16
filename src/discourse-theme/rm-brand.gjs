@@ -1,4 +1,4 @@
-// RC Misfits theme component: the shared top bar and the brand theme that matches the member's
+// RC Misfits theme: the shared top bar and the brand theme that matches the member's
 // colour scheme. Generated from Combustionpunk/brand (src/discourse-theme/): do not edit here.
 import Component from "@glimmer/component";
 import { on } from "@ember/modifier";

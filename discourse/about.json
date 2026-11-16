@@ -1,6 +1,6 @@
 {
   "name": "RC Misfits",
-  "component": true,
+  "component": false,
   "about_url": "https://github.com/Combustionpunk/brand",
   "license_url": "https://github.com/Combustionpunk/brand/tree/main/fonts",
   "authors": "RC Misfits",
@@ -9,6 +9,9 @@
     "rm-oswald-latin": "assets/oswald-latin-wght-normal.woff2",
     "rm-inter-latin-ext": "assets/inter-latin-ext-wght-normal.woff2",
     "rm-inter-latin": "assets/inter-latin-wght-normal.woff2"
+  },
+  "modifiers": {
+    "only_theme_color_schemes": true
   },
   "color_schemes": {
     "RC Misfits: Pit Lane": {

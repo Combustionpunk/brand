@@ -28,10 +28,14 @@ describe("the order of the forum's colour schemes", () => {
 describe("about.json", () => {
   const about = renderAboutJson(tokens, fontsCss);
 
-  it("is a theme component named RC Misfits", () => {
+  it("is a full theme named RC Misfits, because Discourse ignores colour schemes in a component", () => {
     expect(about.name).toBe("RC Misfits");
-    expect(about.component).toBe(true);
+    expect(about.component).toBe(false);
     expect(about.about_url).toBe("https://github.com/Combustionpunk/brand");
+  });
+
+  it("offers members only its own schemes, every one of them selectable", () => {
+    expect(about.modifiers).toEqual({ only_theme_color_schemes: true });
   });
 
   it("has every theme as a colour scheme, Pit Lane first, with the mapped Discourse colours", () => {
@@ -39,6 +43,10 @@ describe("about.json", () => {
     expect(names).toHaveLength(themeIds.length);
     expect(names[0]).toBe("RC Misfits: Pit Lane");
     expect(names[1]).toBe("RC Misfits: Pit Lane light");
+    // On a new install Discourse takes the first dark scheme as the dark default and the first light one as the light default.
+    const all = names.map((name) => themeIds.find((id) => toDiscourseScheme(id, themes[id]!).name === name)!);
+    expect(all.find((id) => themes[id]!.mode === "dark")).toBe("pit-lane");
+    expect(all.find((id) => themes[id]!.mode === "light")).toBe("pit-lane-light");
     for (const id of themeIds) {
       const scheme = toDiscourseScheme(id, themes[id]!);
       expect(about.color_schemes[scheme.name]).toEqual(scheme.colors);

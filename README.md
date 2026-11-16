@@ -125,8 +125,8 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 ### 8. The forum (Discourse)
 
 - `dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme.
-- `discourse/` is the forum's **theme component**, written by `pnpm build`: every theme as a colour scheme, the fonts, tabular figures, and `<rm-header site="forum">` above Discourse's header. On the forum the brand theme is set as `data-rm-theme` on `<html>`, from the colour scheme the member is seeing.
-- Discourse installs a component from a repository's root, not a subfolder. Installing, publishing, the defaults and rolling back are in [`docs/discourse-install.md`](docs/discourse-install.md).
+- `discourse/` is the forum's **Discourse theme** (a full theme: Discourse ignores colour schemes in a component), written by `pnpm build`: every theme as a colour scheme, the fonts, tabular figures, and `<rm-header site="forum">` above Discourse's header. On the forum the brand theme is set as `data-rm-theme` on `<html>`, from the colour scheme the member is seeing.
+- Discourse installs a theme from a repository's root, not a subfolder. Installing, publishing, the defaults and rolling back are in [`docs/discourse-install.md`](docs/discourse-install.md).
 
 ### 9. The shared top bar: `<rm-header>`
 
@@ -197,7 +197,7 @@ React 19 passes these through as attributes. With TypeScript, declare `rm-header
 
 The form is the one the timing site already has (its action and CSRF field stay as they are). The box's local screens do not use the forum links, so they do not use this header.
 
-**The forum (Discourse):** the theme component in `discourse/` includes `header.css` in its stylesheet, bundles `header.js` with its initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It handles `rm-sign-in` and `rm-sign-out` with Discourse's own login and logout. See [`docs/discourse-install.md`](docs/discourse-install.md).
+**The forum (Discourse):** the theme in `discourse/` includes `header.css` in its stylesheet, bundles `header.js` with its initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It handles `rm-sign-in` and `rm-sign-out` with Discourse's own login and logout. See [`docs/discourse-install.md`](docs/discourse-install.md).
 
 `pnpm preview` also writes `preview/header.html` (choose a theme with `?theme=synthwave`).
 
