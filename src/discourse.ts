@@ -1,4 +1,5 @@
 import type { Theme, ThemeKey } from "./types.ts";
+import { themes as defaultThemes } from "./tokens.ts";
 
 /**
  * Which theme key fills each of Discourse's colour-scheme names.
@@ -53,4 +54,26 @@ export function toDiscourseScheme(id: string, theme: Theme): DiscourseScheme {
       names.map((name) => [name, theme.colours[DISCOURSE_MAPPING[name]].replace(/^#/, "").toUpperCase()]),
     ) as Record<DiscourseColourName, string>,
   };
+}
+
+const normaliseHex = (value: string | undefined) =>
+  (value ?? "").trim().replace(/^#/, "").toUpperCase();
+
+/**
+ * Which brand theme Discourse is showing, from its live colours (`--primary`, `--secondary`...),
+ * or `undefined` if the scheme is not exactly one of the brand's (for example, an admin changed it).
+ * Values may be given with or without `#`, in either case.
+ */
+export function schemeIdFromColours(
+  colours: Partial<Record<string, string>>,
+  schemes: Record<string, Theme> = defaultThemes,
+): string | undefined {
+  const names = Object.keys(DISCOURSE_MAPPING) as DiscourseColourName[];
+  for (const [id, theme] of Object.entries(schemes)) {
+    const { colors } = toDiscourseScheme(id, theme);
+    if (names.every((name) => normaliseHex(colours[name]) === colors[name])) {
+      return id;
+    }
+  }
+  return undefined;
 }

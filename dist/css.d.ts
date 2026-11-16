@@ -5,6 +5,8 @@ export declare function cssVarName(key: string): string;
 export declare function themeMode(colours: ThemeColours): ThemeMode;
 /** A theme as `{ "--rm-bg": "#17181B", ... }`, for an inline `style`. */
 export declare function themeToVars(colours: ThemeColours): Record<string, string>;
+/** A theme's declarations: `color-scheme` and one `--rm-*` per key. */
+export declare function themeDeclarations(colours: ThemeColours): string[];
 /**
  * A theme as CSS, for a generated theme ("Match my car", club colours).
  *
@@ -13,5 +15,7 @@ export declare function themeToVars(colours: ThemeColours): Record<string, strin
  *   `themeToCss(theme, '[data-theme="custom"]')`.
  */
 export declare function themeToCss(colours: ThemeColours, selector?: string): string;
+/** The declarations every theme shares: fonts, type styles, spacing, radii and race colours. */
+export declare function sharedDeclarations(tokens: Tokens): string[];
 /** The whole of `dist/tokens.css`. */
 export declare function renderTokensCss(tokens: Tokens): string;

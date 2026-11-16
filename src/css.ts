@@ -19,7 +19,8 @@ export function themeToVars(colours: ThemeColours): Record<string, string> {
   return Object.fromEntries(THEME_KEYS.map((key) => [cssVarName(key), colours[key]]));
 }
 
-function declarations(colours: ThemeColours): string[] {
+/** A theme's declarations: `color-scheme` and one `--rm-*` per key. */
+export function themeDeclarations(colours: ThemeColours): string[] {
   return [`color-scheme: ${themeMode(colours)};`, ...THEME_KEYS.map((key) => `${cssVarName(key)}: ${colours[key]};`)];
 }
 
@@ -31,18 +32,15 @@ function declarations(colours: ThemeColours): string[] {
  *   `themeToCss(theme, '[data-theme="custom"]')`.
  */
 export function themeToCss(colours: ThemeColours, selector?: string): string {
-  const lines = declarations(colours);
+  const lines = themeDeclarations(colours);
   if (selector === undefined) {
     return lines.join(" ");
   }
   return `${selector} {\n${lines.map((line) => `  ${line}`).join("\n")}\n}\n`;
 }
 
-/** The whole of `dist/tokens.css`. */
-export function renderTokensCss(tokens: Tokens): string {
-  const rule = (selector: string, lines: string[], indent = "") =>
-    `${indent}${selector} {\n${lines.map((line) => `${indent}  ${line}`).join("\n")}\n${indent}}\n`;
-
+/** The declarations every theme shares: fonts, type styles, spacing, radii and race colours. */
+export function sharedDeclarations(tokens: Tokens): string[] {
   const shared: string[] = [
     `--rm-font-display: ${tokens.font.display.stack};`,
     `--rm-font-body: ${tokens.font.body.stack};`,
@@ -67,20 +65,29 @@ export function renderTokensCss(tokens: Tokens): string {
     shared.push(`--rm-race-${kebab(colour.key)}: ${colour.hex};`);
   }
 
+  return shared;
+}
+
+/** The whole of `dist/tokens.css`. */
+export function renderTokensCss(tokens: Tokens): string {
+  const rule = (selector: string, lines: string[], indent = "") =>
+    `${indent}${selector} {\n${lines.map((line) => `${indent}  ${line}`).join("\n")}\n${indent}}\n`;
+
+  const shared = sharedDeclarations(tokens);
   const dark = tokens.themes[tokens.defaultTheme]!;
   const light = tokens.themes[tokens.defaultLightTheme]!;
 
   const parts: string[] = [
     "/* RC Misfits brand tokens. Generated from tokens.json by `pnpm build`: do not edit. */\n",
-    `/* The default theme: ${dark.name}. */\n` + rule(":root", [...declarations(dark.colours), ...shared]),
+    `/* The default theme: ${dark.name}. */\n` + rule(":root", [...themeDeclarations(dark.colours), ...shared]),
     `/* No theme chosen and the device asks for light: ${light.name}. */\n` +
       `@media (prefers-color-scheme: light) {\n` +
-      rule(":root:not([data-theme])", declarations(light.colours), "  ") +
+      rule(":root:not([data-theme])", themeDeclarations(light.colours), "  ") +
       `}\n`,
     "/* A chosen theme: <html data-theme=\"...\">. */",
   ];
   for (const [id, theme] of Object.entries(tokens.themes)) {
-    parts.push(`/* ${theme.name} */\n` + rule(`[data-theme="${id}"]`, declarations(theme.colours)));
+    parts.push(`/* ${theme.name} */\n` + rule(`[data-theme="${id}"]`, themeDeclarations(theme.colours)));
   }
   parts.push(
     "/* Timing numbers: figures of equal width, so columns line up and digits do not jump. */\n" +

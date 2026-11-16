@@ -877,11 +877,11 @@ function themeMode(colours) {
 function themeToVars(colours) {
   return Object.fromEntries(THEME_KEYS.map((key) => [cssVarName(key), colours[key]]));
 }
-function declarations(colours) {
+function themeDeclarations(colours) {
   return [`color-scheme: ${themeMode(colours)};`, ...THEME_KEYS.map((key) => `${cssVarName(key)}: ${colours[key]};`)];
 }
 function themeToCss(colours, selector) {
-  const lines = declarations(colours);
+  const lines = themeDeclarations(colours);
   if (selector === void 0) {
     return lines.join(" ");
   }
@@ -915,6 +915,17 @@ function toDiscourseScheme(id, theme) {
     )
   };
 }
+var normaliseHex2 = (value) => (value ?? "").trim().replace(/^#/, "").toUpperCase();
+function schemeIdFromColours(colours, schemes = themes) {
+  const names = Object.keys(DISCOURSE_MAPPING);
+  for (const [id, theme] of Object.entries(schemes)) {
+    const { colors } = toDiscourseScheme(id, theme);
+    if (names.every((name) => normaliseHex2(colours[name]) === colors[name])) {
+      return id;
+    }
+  }
+  return void 0;
+}
 export {
   DISCOURSE_MAPPING,
   MIN_TEXT_CONTRAST,
@@ -926,6 +937,7 @@ export {
   generateTheme,
   pickRoles,
   raceColours,
+  schemeIdFromColours,
   themeFromRoles,
   themeIds,
   themeMode,

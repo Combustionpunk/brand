@@ -40,3 +40,9 @@ export interface DiscourseScheme {
 }
 /** A Discourse colour scheme for a theme: the contents of `dist/discourse/<id>.json`. */
 export declare function toDiscourseScheme(id: string, theme: Theme): DiscourseScheme;
+/**
+ * Which brand theme Discourse is showing, from its live colours (`--primary`, `--secondary`...),
+ * or `undefined` if the scheme is not exactly one of the brand's (for example, an admin changed it).
+ * Values may be given with or without `#`, in either case.
+ */
+export declare function schemeIdFromColours(colours: Partial<Record<string, string>>, schemes?: Record<string, Theme>): string | undefined;

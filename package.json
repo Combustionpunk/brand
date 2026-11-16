@@ -44,7 +44,7 @@
     "test": "vitest run",
     "build": "node scripts/build.ts",
     "preview": "node scripts/preview.ts",
-    "check:dist": "pnpm build && git diff --exit-code -- dist"
+    "check:dist": "pnpm build && git diff --exit-code -- dist discourse && test -z \"$(git status --porcelain -- dist discourse)\""
   },
   "packageManager": "pnpm@12.11.2",
   "devDependencies": {
