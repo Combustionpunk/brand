@@ -722,7 +722,13 @@ function toDiscourseScheme(id, theme) {
     )
   };
 }
-var normaliseHex = (value) => (value ?? "").trim().replace(/^#/, "").toUpperCase();
+function normaliseHex(value) {
+  const hex = (value ?? "").trim().replace(/^#/, "").toUpperCase();
+  if (!/^(?:[0-9A-F]{3,4}|[0-9A-F]{6}|[0-9A-F]{8})$/.test(hex)) return void 0;
+  const long = hex.length <= 4 ? [...hex].map((digit) => digit + digit).join("") : hex;
+  if (long.length === 8 && !long.endsWith("FF")) return void 0;
+  return long.slice(0, 6);
+}
 function schemeIdFromColours(colours, schemes = themes) {
   const names = Object.keys(DISCOURSE_MAPPING);
   for (const [id, theme] of Object.entries(schemes)) {

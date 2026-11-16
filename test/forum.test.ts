@@ -16,6 +16,21 @@ describe("syncForumTheme", () => {
     expect(root.getAttribute("data-rm-theme")).toBe("synthwave");
   });
 
+  it("still finds every light theme when Discourse's CSS gives short hex (#fff)", () => {
+    const shorten = (hex: string) =>
+      /^(.)\1(.)\2(.)\3$/.test(hex) ? `#${hex[0]}${hex[2]}${hex[4]}`.toLowerCase() : `#${hex.toLowerCase()}`;
+    const light = Object.keys(themes).filter((id) => themes[id]!.mode === "light");
+    expect(light).toContain("pit-lane-light");
+    for (const id of light) {
+      const root = document.createElement("div");
+      const { colors } = toDiscourseScheme(id, themes[id]!);
+      for (const [name, hex] of Object.entries(colors)) root.style.setProperty(`--${name}`, shorten(hex));
+      expect(root.style.getPropertyValue("--header_background")).toBe("#fff");
+      expect(syncForumTheme(root, (name) => root.style.getPropertyValue(name)), id).toBe(id);
+      expect(root.getAttribute("data-rm-theme")).toBe(id);
+    }
+  });
+
   it("follows a change of scheme, and removes the attribute for a scheme that is not a brand theme", () => {
     const root = document.createElement("div");
     const read = (name: string) => root.style.getPropertyValue(name);

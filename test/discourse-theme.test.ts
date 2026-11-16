@@ -132,6 +132,40 @@ describe("matching Discourse's live colours to a brand theme", () => {
     }
   });
 
+  it("matches short hex: #fff is FFFFFF, as Sass may write it", () => {
+    const { colors } = toDiscourseScheme("pit-lane-light", themes["pit-lane-light"]!);
+    expect(colors.header_background).toBe("FFFFFF");
+    expect(schemeIdFromColours({ ...colors, header_background: "#fff" })).toBe("pit-lane-light");
+    expect(schemeIdFromColours({ ...colors, header_background: "#FFF" })).toBe("pit-lane-light");
+    expect(schemeIdFromColours({ ...colors, header_background: "fff" })).toBe("pit-lane-light");
+    expect(schemeIdFromColours({ ...colors, header_background: "#ffff" })).toBe("pit-lane-light");
+    expect(schemeIdFromColours({ ...colors, header_background: "#ffffffff" })).toBe("pit-lane-light");
+  });
+
+  it("resolves a whole scheme given in short hex to its theme", () => {
+    // Every colour that can be written with three digits is, in lower case, as a minifier would.
+    const shorten = (hex: string) =>
+      /^(.)\1(.)\2(.)\3$/.test(hex) ? `#${hex[0]}${hex[2]}${hex[4]}`.toLowerCase() : `#${hex.toLowerCase()}`;
+    const schemes = {
+      short: { ...themes["pit-lane-light"]!, colours: { ...themes["pit-lane-light"]!.colours, text: "#112233", bg: "#FFFFFF", surface: "#EEEEEE", accent: "#AA5500", fast: "#0055AA", danger: "#CC0000", pb: "#007744" } },
+    };
+    const { colors } = toDiscourseScheme("short", schemes.short);
+    const live = Object.fromEntries(Object.entries(colors).map(([k, v]) => [k, shorten(v)]));
+    expect(Object.values(live).every((v) => v.length === 4)).toBe(true);
+    expect(schemeIdFromColours(live, schemes)).toBe("short");
+    for (const id of themeIds) {
+      const real = toDiscourseScheme(id, themes[id]!).colors;
+      expect(schemeIdFromColours(Object.fromEntries(Object.entries(real).map(([k, v]) => [k, shorten(v)])))).toBe(id);
+    }
+  });
+
+  it("does not match a see-through colour or one that is not hex", () => {
+    const { colors } = toDiscourseScheme("pit-lane-light", themes["pit-lane-light"]!);
+    for (const bad of ["#fff8", "#ffffff80", "#ff", "#fffff", "white", "ggg", ""]) {
+      expect(schemeIdFromColours({ ...colors, header_background: bad }), bad).toBeUndefined();
+    }
+  });
+
   it("gives no theme for a scheme the admin has changed", () => {
     const { colors } = toDiscourseScheme("pit-lane", themes["pit-lane"]!);
     expect(schemeIdFromColours({ ...colors, tertiary: "123456" })).toBeUndefined();

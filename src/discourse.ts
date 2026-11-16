@@ -56,13 +56,23 @@ export function toDiscourseScheme(id: string, theme: Theme): DiscourseScheme {
   };
 }
 
-const normaliseHex = (value: string | undefined) =>
-  (value ?? "").trim().replace(/^#/, "").toUpperCase();
+/**
+ * `RRGGBB` in upper case from any hex form CSS allows, or `undefined`: `#fff`, `fff`, `#ffff`,
+ * `#FFFFFF`, `#ffffffff`. Sass may shorten `#FFFFFF` to `#fff` when it compiles Discourse's colour
+ * variables. A colour that is at all see-through is not a brand colour, so it gives `undefined`.
+ */
+function normaliseHex(value: string | undefined): string | undefined {
+  const hex = (value ?? "").trim().replace(/^#/, "").toUpperCase();
+  if (!/^(?:[0-9A-F]{3,4}|[0-9A-F]{6}|[0-9A-F]{8})$/.test(hex)) return undefined;
+  const long = hex.length <= 4 ? [...hex].map((digit) => digit + digit).join("") : hex;
+  if (long.length === 8 && !long.endsWith("FF")) return undefined;
+  return long.slice(0, 6);
+}
 
 /**
  * Which brand theme Discourse is showing, from its live colours (`--primary`, `--secondary`...),
  * or `undefined` if the scheme is not exactly one of the brand's (for example, an admin changed it).
- * Values may be given with or without `#`, in either case.
+ * Values may be given with or without `#`, in either case, and in short form (`#fff`).
  */
 export function schemeIdFromColours(
   colours: Partial<Record<string, string>>,

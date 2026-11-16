@@ -80,7 +80,7 @@ On an older Discourse (no `only_theme_color_schemes`), an admin does it once per
 ## Roll back
 
 - **Fast, no git:** make the old theme the default again (**Set as default** on it). The forum is back to its old header, fonts and palettes at once. Members' palette choices are kept, and come back if RC Misfits is made the default again.
-- **To an earlier version:** Discourse keeps no history of a theme. Delete **RC Misfits**, then install it again with the branch set to an earlier tag, for example `discourse-v0.2.0`. (`git clone --branch` takes a tag as well as a branch.) It stays on that tag until it is reinstalled from `discourse-theme`.
+- **To an earlier version:** Discourse keeps no history of a theme. Delete **RC Misfits**, then install it again with the branch set to an earlier tag, for example `discourse-v0.3.0`. (`git clone --branch` takes a tag as well as a branch.) It stays on that tag until it is reinstalled from `discourse-theme`.
 - Deleting the theme also deletes its palettes, and reinstalling makes new ones. Members who chose a palette go back to the default, and have to choose again.
 
 ## Test on the dev forum (discourse-dev, CT 101)
