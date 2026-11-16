@@ -1,8 +1,8 @@
 import { type DiscourseColourName } from "./discourse.js";
 import type { ThemeKey, Tokens } from "./types.js";
 /**
- * The attribute on `<html>` that names the brand theme on the forum. Not `data-theme`, which
- * Discourse may use itself. The component's script sets it from the member's colour scheme.
+ * The attribute on `<html>` that names the brand theme on the forum. Not `data-theme`, to keep
+ * clear of Discourse's `data-theme-id` and of other components. The component's script sets it from the member's colour scheme.
  */
 export declare const FORUM_THEME_ATTRIBUTE = "data-rm-theme";
 /** The repo the component comes from. */

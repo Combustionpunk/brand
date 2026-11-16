@@ -124,7 +124,9 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 
 ### 8. The forum (Discourse)
 
-`dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme. The Discourse theme component is a later issue; it will build its `color_schemes` from these files.
+- `dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme.
+- `discourse/` is the forum's **theme component**, written by `pnpm build`: every theme as a colour scheme, the fonts, tabular figures, and `<rm-header site="forum">` above Discourse's header. On the forum the brand theme is set as `data-rm-theme` on `<html>`, from the colour scheme the member is seeing.
+- Discourse installs a component from a repository's root, not a subfolder. Installing, publishing, the defaults and rolling back are in [`docs/discourse-install.md`](docs/discourse-install.md).
 
 ### 9. The shared top bar: `<rm-header>`
 
@@ -195,7 +197,7 @@ React 19 passes these through as attributes. With TypeScript, declare `rm-header
 
 The form is the one the timing site already has (its action and CSRF field stay as they are). The box's local screens do not use the forum links, so they do not use this header.
 
-**The forum (Discourse):** the theme component (a later issue) adds `header.css` to its stylesheet, imports `header.js` in an initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It listens for `rm-sign-out`, calls `preventDefault()`, and uses Discourse's own logout.
+**The forum (Discourse):** the theme component in `discourse/` includes `header.css` in its stylesheet, bundles `header.js` with its initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It handles `rm-sign-in` and `rm-sign-out` with Discourse's own login and logout. See [`docs/discourse-install.md`](docs/discourse-install.md).
 
 `pnpm preview` also writes `preview/header.html` (choose a theme with `?theme=synthwave`).
 
@@ -336,9 +338,9 @@ Node 24, pnpm, TypeScript, Vitest.
 |---|---|
 | `pnpm typecheck` | Type-checks `src`, `scripts` and `test`. |
 | `pnpm test` | Runs the tests, including the contrast checks for every theme and for generator output. |
-| `pnpm build` | Writes `dist/` from `tokens.json` and `src/`. |
+| `pnpm build` | Writes `dist/` and `discourse/` from `tokens.json` and `src/`. |
 | `pnpm preview` | Writes `preview/index.html` (every theme's swatches, a top bar, a practice table and buttons) and `preview/header.html` (`<rm-header>` per site). Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
-| `pnpm check:dist` | Builds, then fails if the committed `dist/` was out of date. |
+| `pnpm check:dist` | Builds, then fails if the committed `dist/` or `discourse/` was out of date. |
 
 - **`tokens.json` is the single source.** Change it, then run `pnpm build` and commit `dist/` with it. A test fails if `dist/tokens.css` or the Discourse schemes do not match `tokens.json`.
 - **Changing any colour is a Board decision.**
