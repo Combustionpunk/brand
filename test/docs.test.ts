@@ -15,8 +15,8 @@ function optionOne(): string {
 }
 
 describe("docs/discourse-install.md: publishing the discourse-theme branch (#7)", () => {
-  it("uses filter-branch, not git subtree, anywhere in the doc", () => {
-    expect(doc).not.toMatch(/git subtree/);
+  it("uses filter-branch, and no `git subtree split` command anywhere in the doc", () => {
+    expect(doc).not.toMatch(/git subtree split --prefix/);
     const text = optionOne();
     expect(text).toContain("git branch discourse-theme-new main");
     expect(text).toContain(

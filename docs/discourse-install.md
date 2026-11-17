@@ -29,13 +29,20 @@ The RC Misfits look on the forum (Discourse) is a **Discourse theme** built from
 
    ```sh
    git checkout main && git pull
-   git subtree split --prefix discourse -b discourse-theme-new
+   git branch discourse-theme-new main
+   FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --subdirectory-filter discourse discourse-theme-new
+   git ls-tree --name-only discourse-theme-new      # about.json etc. at the top, no discourse/
    git push origin discourse-theme-new:discourse-theme   # add --force only if the history was rewritten
-   git tag discourse-v0.3.0 discourse-theme-new && git push origin discourse-v0.3.0
+   git tag discourse-vX.Y.Z discourse-theme-new && git push origin discourse-vX.Y.Z
    git branch -D discourse-theme-new
    ```
 
-   `git subtree split` gives the same commits each time for the same history, so a normal push fast-forwards. The `discourse-vX.Y.Z` tags are for rolling back (below). A CI job on each `v*` tag could do this later; for now it is manual, because agents never push anything but PR branches.
+   - **It uses only git's built-in `filter-branch`**, so it works in a GitHub Codespace, whose git has no `git subtree`. The first publish was done this way (`discourse-theme` at `46c78fa`, tagged `discourse-v0.3.0`, the same tree as `discourse/` on main at `8d71d1b`).
+   - **Every release must use this method.** `filter-branch` gives the same commits each time for the same history, so a normal push fast-forwards. `git subtree split` gives different commit ids, so mixing the two stops the push fast-forwarding.
+   - **`--force` is only for when the history was rewritten** (main itself rewritten). If a normal push is refused for any other reason, stop and find out why first.
+   - **`refs/original/`:** `filter-branch` keeps a backup of the branch it rewrote, under `refs/original/refs/heads/discourse-theme-new`. `git branch -D` does not remove it, so a second run in the same clone refuses to start. Either add `-f` (`git filter-branch -f --subdirectory-filter ...`), or first run `git update-ref -d refs/original/refs/heads/discourse-theme-new`. A fresh clone or Codespace has no backup, so it needs neither.
+
+   The `discourse-vX.Y.Z` tags are for rolling back (below). A CI job on each `v*` tag could do this later; for now it is manual, because agents never push anything but PR branches.
 2. **A separate public repo** (for example `Combustionpunk/rcmisfits-discourse`) holding a copy of `discourse/`, updated the same way. This is how most Discourse themes are published, but it is a second repo to keep in step.
 3. **Upload** (no git): zip the folder (`cd discourse && zip -r ../rcmisfits-discourse.zip .`) and use **Install › From your device**. It works today, with no Board decision, but the forum cannot pull updates; every update is a new upload.
 
