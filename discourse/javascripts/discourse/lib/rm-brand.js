@@ -1233,6 +1233,12 @@ function watchForumTheme(doc = document, options = {}) {
   const root = doc.documentElement;
   const media = doc.defaultView?.matchMedia?.("(prefers-color-scheme: dark)");
   const read = options.read ?? ((p) => getComputedStyle(root).getPropertyValue(p));
+  let cached = { key: "", css: "" };
+  const cssFor = (colours, mode) => {
+    const key = `${mode} ${colours.join(" ")}`;
+    if (cached.key !== key) cached = { key, css: matchMyCarCss(colours, mode) };
+    return cached.css;
+  };
   const sync = () => {
     const colours = options.matchMyCar?.();
     let style = doc.getElementById(MATCH_MY_CAR_STYLE_ID);
@@ -1241,7 +1247,7 @@ function watchForumTheme(doc = document, options = {}) {
       syncForumTheme(root, read);
       return;
     }
-    const css = matchMyCarCss(colours, media?.matches === false ? "light" : "dark");
+    const css = cssFor(colours, media?.matches === false ? "light" : "dark");
     if (style === null) {
       style = doc.createElement("style");
       style.id = MATCH_MY_CAR_STYLE_ID;

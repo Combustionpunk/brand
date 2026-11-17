@@ -177,3 +177,24 @@ describe("watchForumTheme with Match my car", () => {
     expect(listeners.size).toBe(0);
   });
 });
+
+describe("watchForumTheme's work on each change to <head>", () => {
+  it("works the theme out again only when the colours or the mode change", async () => {
+    const generate = await import("../src/generate.ts");
+    const spy = vi.spyOn(generate, "generateTheme");
+    const { doc, switchTo } = fakeDevice(true);
+    let colours = ["#0B1F4B"];
+    const watcher = watchForumTheme(doc, { matchMyCar: () => colours });
+    const first = spy.mock.calls.length;
+    watcher.refresh();
+    watcher.refresh();
+    expect(spy.mock.calls.length).toBe(first);
+    switchTo("light");
+    expect(spy.mock.calls.length).toBe(first + 1);
+    colours = ["#D50000"];
+    watcher.refresh();
+    expect(spy.mock.calls.length).toBe(first + 2);
+    watcher.stop();
+    spy.mockRestore();
+  });
+});

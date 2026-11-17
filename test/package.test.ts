@@ -129,7 +129,7 @@ describe("the README agrees with the package", () => {
   const version = (JSON.parse(read("package.json")) as { version: string }).version;
 
   it("pins the install line to the package's own version", () => {
-    expect(version).toBe("0.3.0");
+    expect(version).toBe("0.4.0");
     const pinned = [...readme.matchAll(/pnpm add github:Combustionpunk\/brand#v(\S+)/g)].map((match) => match[1]);
     expect(pinned).toEqual([version]);
   });
