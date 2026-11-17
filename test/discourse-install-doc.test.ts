@@ -24,7 +24,7 @@ describe("docs/discourse-install.md (#9)", () => {
 
   it("makes the palettes user-selectable after install, with a read-only preview and the console command", () => {
     const install = section("Install");
-    expect(install).toMatch(/Users can select/);
+    expect(install).toMatch(/Allow users to select/);
     expect(install).toMatch(/user_selectable/);
     expect(doc).toMatch(/pluck\(:id, :name, :user_selectable\)/); // preview first, read-only
     expect(doc).toMatch(/update!\(user_selectable: true\)/);

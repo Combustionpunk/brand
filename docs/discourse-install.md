@@ -55,13 +55,15 @@ The steps below assume option 1. For option 2, use that repo's URL and leave the
 
 ### Make the palettes user-selectable (after every install)
 
-Turn on **User selectable** (older versions call it "Users can select") on each of the 17 `RC Misfits: …` palettes. Either route changes the theme's own palette in place. It does not make a copy, so theme updates still reach it.
+Make each of the 17 `RC Misfits: …` palettes user-selectable (the admin calls it **Allow users to select**; the palette's own page has a toggle, **Color palette can be selected by users**). Either route changes the theme's own palette in place. It does not make a copy, so theme updates still reach it.
 
-- **In the admin (17 clicks):** **Admin › Appearance › Color palettes**, then on each `RC Misfits: …` palette the **⋯** menu › **Allow users to select**. (Or open the palette, turn on **User selectable** and **Save**. Change nothing else on that page: editing a theme palette's colours *does* fork it into a copy.)
+- **In the admin (17 clicks):** **Admin › Appearance › Color palettes**, then on each `RC Misfits: …` palette the **⋯** menu › **Allow users to select**. (Or open the palette, turn on **Color palette can be selected by users** and press **Save changes**. Change nothing else on that page: editing a theme palette's colours *does* fork it into a copy.)
 - **From the Rails console** (`./launcher enter app`, then `rails c`). Preview first; this only reads:
 
   ```ruby
-  theme = Theme.find_by!(name: "RC Misfits", component: false)
+  Theme.where(name: "RC Misfits", component: false).pluck(:id, :name)   # which theme(s)
+  theme = Theme.find_default   # the site default; check it is RC Misfits
+  theme.name                   # → "RC Misfits"
   ColorScheme.where(theme_id: theme.id).order(:id).pluck(:id, :name, :user_selectable)
   # → 17 rows, every name starting "RC Misfits: "
   ```
@@ -74,13 +76,14 @@ Turn on **User selectable** (older versions call it "Users can select") on each 
   ColorScheme.where(theme_id: theme.id).order(:id).pluck(:id, :name, :user_selectable)   # all true
   ```
 
-  If more than one theme is called RC Misfits (as on the dev forum), `find_by!` takes the first. Use `Theme.find(<id>)` with the id of the one that is the default.
+  If RC Misfits is not the site default yet (or more than one theme is called RC Misfits, as on the dev forum), use `theme = Theme.find(<id>)` with the id from the first line.
 
 **Why the console step is needed** (Discourse core, at [`9de20de`](https://github.com/discourse/discourse/tree/9de20dea352c045d9954574c250d17aa5fcd4c4a)):
 
 - [`ApplicationHelper#user_scheme_id` and `#user_dark_scheme_id`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/helpers/application_helper.rb#L688-L726) use a member's saved palette only if it is `user_selectable: true` (or is the theme's default). Otherwise the page loads the theme's default.
 - [`SiteSerializer#user_color_schemes`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/serializers/site_serializer.rb#L100-L116) offers theme-owned palettes when the modifier is on, whatever the flag. That is why the dropdown offers palettes the server then ignores.
 - [`RemoteTheme#update_theme_color_schemes`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/models/remote_theme.rb#L549-L620) builds new palettes with the column's default, `false`, and nothing in `about.json` can set it. A theme cannot set the flag itself.
+- The member's choice reaches the page as `user_color_scheme_id: user_scheme_id || -1` ([`ApplicationHelper`]({B}/app/helpers/application_helper.rb#L1062-L1063)), which is why an ignored choice shows as a blank dropdown (below).
 - [`ColorSchemeRevisor`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/services/color_scheme_revisor.rb) sets `user_selectable` on the same row; only a change of **colours** calls `diverge_from_remote` and makes a copy.
 - The member theme picker (plugin #407, `DesMemberTheme.scheme_for`) also looks for `user_selectable: true`, so it needs this step too.
 
@@ -104,8 +107,8 @@ On a current Discourse, the modifier offers every `RC Misfits: …` palette, and
 
 **What the closed dropdown shows.** The page is given the member's palette only if the server applied it; otherwise it gets "none" (`-1`). With the modifier on, the list has no "none" entry, so the closed dropdown is **blank** (the names show once it's open). That happens:
 
-- for every member while the palettes are not user-selectable (issue #9: this is the blank label Yeti saw on live);
-- for a member who has never chosen a palette (Discourse core behaviour; the forum shows the default, and the label fills in once they choose and save);
+- for every member while the palettes are not user-selectable (issue #9: this is the blank label Yeti saw on live), except one whose saved palette is the theme's own default, which the server accepts anyway;
+- for a member who has never chosen a palette (Discourse core behaviour: [`listColorSchemes`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/frontend/discourse/app/lib/color-scheme-picker.js#L39-L56) adds its "default" entry only when the list is *not* limited to the theme; the forum shows the default, and the label fills in once they choose and save);
 - for a member who chose a palette before RC Misfits became the default: that palette isn't one of the theme's, so the forum uses the default. If the old palette was itself user-selectable, the dropdown may show its ID number (for example "7") instead. They choose again.
 
 Once the palettes are user-selectable, a member who has chosen and saved one sees its name, in the light and the dark dropdown.
@@ -113,7 +116,7 @@ Once the palettes are user-selectable, a member who has chosen and saved one see
 ## Update
 
 - **Admin › Appearance › Themes and components › RC Misfits › Check for updates**, then **Update to latest**. Discourse pulls the `discourse-theme` branch again.
-- Palettes from the theme are updated in place, **matched by name**, so **User selectable** (`user_selectable`) and members' choices survive an update: the update only rewrites the colours.
+- Palettes from the theme are updated in place, **matched by name**, so `user_selectable` and members' choices survive an update: the update only rewrites the colours. (This is read from the core code; step 4 of the dev checklist confirms it.)
 - A palette that is no longer in `about.json` is deleted, and a **renamed** palette arrives as a new one with `user_selectable` off. So renaming a theme in `tokens.json` (a test pins the names) means members who chose it lose their choice, and the console step above has to be run again after the update.
 - If an admin edits a palette on the forum, Discourse turns it into a separate copy, and updates no longer reach that copy. Don't edit the palettes on the forum: colours are changed in `tokens.json`, by the Board. (An edited palette also stops matching a brand theme, so the top bar falls back to Discourse's colours.)
 
