@@ -62,12 +62,13 @@ describe("discourseVariables", () => {
     it(`gives what Discourse itself compiles for ${id}, to within one step per channel`, () => {
       const compiled = fixture(id);
       // The fixtures were compiled before #15 darkened Pit Lane light's accent; give the colours they were made from.
-      // The two row colours are the brand's choice, not core's sums, and #15 changed how they are picked.
+      // The two row colours are the brand's choice, not core's sums, and #15 changed how they are picked:
+      // for such a fixture they (and the one core derives from them) are left out. Pit Lane's are unchanged.
       const colours = { ...themes[id]!.colours, ...FIXTURE_COLOURS[id] };
       const ours = discourseVariables(colours);
 
       const wanted = [...compiled]
-        .filter(([name, value]) => !isConstant(name, value) && !ROW_VARIABLES.includes(name))
+        .filter(([name, value]) => !isConstant(name, value) && !(id in FIXTURE_COLOURS && ROW_VARIABLES.includes(name)))
         .map(([name]) => name);
       expect(wanted.length).toBeGreaterThan(100);
       expect(wanted.filter((name) => !(name in ours))).toEqual([]);

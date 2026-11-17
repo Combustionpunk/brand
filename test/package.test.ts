@@ -153,3 +153,11 @@ describe("CI", () => {
     expect(ci).toMatch(/run: pnpm check:dist/);
   });
 });
+
+describe("generated files are the same on every machine", () => {
+  it("name no absolute paths, so pnpm check:dist passes in CI as well as here", () => {
+    for (const path of ["dist/header.js", "dist/index.js", "discourse/javascripts/discourse/lib/rm-brand.js", "discourse/common/common.scss"]) {
+      expect(read(path), path).not.toContain(root);
+    }
+  });
+});
