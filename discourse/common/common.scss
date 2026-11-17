@@ -148,6 +148,7 @@ html[data-rm-theme="pit-lane"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #9DA1AB;
   --primary-med-or-secondary-high: #9EA1A6;
+  --primary-low-mid-or-secondary-high: #9EA1A6;
 }
 
 /* Pit Lane light */
@@ -172,6 +173,7 @@ html[data-rm-theme="pit-lane-light"] {
   --primary-700: #5D606B;
   --primary-med-or-secondary-med: #5E6069;
   --primary-med-or-secondary-high: #5E6069;
+  --primary-low-mid-or-secondary-high: #5F6065;
 }
 
 /* Synthwave */
@@ -195,6 +197,7 @@ html[data-rm-theme="synthwave"] {
   --primary-600: #B28BCE;
   --primary-med-or-secondary-med: #A98CDB;
   --primary-med-or-secondary-high: #A591C5;
+  --primary-low-mid-or-secondary-high: #A591C5;
   --primary-700: #B28BCE;
 }
 
@@ -219,6 +222,7 @@ html[data-rm-theme="synthwave-light"] {
   --primary-600: #724AAE;
   --primary-med-or-secondary-med: #724AAE;
   --primary-med-or-secondary-high: #724AAE;
+  --primary-low-mid-or-secondary-high: #6B558B;
 }
 
 /* Garage */
@@ -240,6 +244,7 @@ html[data-rm-theme="garage"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #ABA396;
   --primary-med-or-secondary-high: #A9A399;
+  --primary-low-mid-or-secondary-high: #A9A399;
 }
 
 /* Garage light */
@@ -267,6 +272,7 @@ html[data-rm-theme="garage-light"] {
   --primary-med-or-secondary-med: #676359;
   --primary-med-or-secondary-high: #676359;
   --primary-high-or-secondary-low: #686257;
+  --primary-low-mid-or-secondary-high: #65635D;
 }
 
 /* Fluoro */
@@ -288,6 +294,7 @@ html[data-rm-theme="fluoro"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #939C82;
   --primary-med-or-secondary-high: #959B8B;
+  --primary-low-mid-or-secondary-high: #959B8B;
 }
 
 /* Fluoro light */
@@ -315,6 +322,7 @@ html[data-rm-theme="fluoro-light"] {
   --primary-med-or-secondary-med: #606655;
   --primary-med-or-secondary-high: #606655;
   --primary-high-or-secondary-low: #5F6751;
+  --primary-low-mid-or-secondary-high: #61665A;
 }
 
 /* Racing Green */
@@ -336,6 +344,7 @@ html[data-rm-theme="racing-green"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #78B191;
   --primary-med-or-secondary-high: #90AB98;
+  --primary-low-mid-or-secondary-high: #90AB98;
 }
 
 /* Racing Green light */
@@ -363,6 +372,7 @@ html[data-rm-theme="racing-green-light"] {
   --primary-med-or-secondary-med: #466D58;
   --primary-med-or-secondary-high: #466D58;
   --primary-high-or-secondary-low: #3F6F55;
+  --primary-low-mid-or-secondary-high: #526B5D;
 }
 
 /* Works Blue */
@@ -387,6 +397,7 @@ html[data-rm-theme="works-blue"] {
   --primary-700: #86A4E1;
   --primary-med-or-secondary-med: #88A4E4;
   --primary-med-or-secondary-high: #91A4CF;
+  --primary-low-mid-or-secondary-high: #91A4CF;
 }
 
 /* Works Blue light */
@@ -411,6 +422,7 @@ html[data-rm-theme="works-blue-light"] {
   --primary-700: #425D99;
   --primary-med-or-secondary-med: #495E8D;
   --primary-med-or-secondary-high: #495E8D;
+  --primary-low-mid-or-secondary-high: #535E79;
 }
 
 /* Red Line */
@@ -432,6 +444,7 @@ html[data-rm-theme="red-line"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #9C9C9C;
   --primary-med-or-secondary-high: #9C9C9C;
+  --primary-low-mid-or-secondary-high: #9C9C9C;
 }
 
 /* Red Line light */
@@ -459,6 +472,7 @@ html[data-rm-theme="red-line-light"] {
   --primary-med-or-secondary-med: #626262;
   --primary-med-or-secondary-high: #626262;
   --primary-high-or-secondary-low: #626262;
+  --primary-low-mid-or-secondary-high: #626262;
 }
 
 /* Sunset */
@@ -480,6 +494,7 @@ html[data-rm-theme="sunset"] {
   --rm-warning: #FFB648;
   --primary-med-or-secondary-med: #B9958A;
   --primary-med-or-secondary-high: #AF988F;
+  --primary-low-mid-or-secondary-high: #AF988F;
 }
 
 /* Sunset light */
@@ -504,6 +519,7 @@ html[data-rm-theme="sunset-light"] {
   --primary-700: #7A5952;
   --primary-med-or-secondary-med: #7A5952;
   --primary-med-or-secondary-high: #7A5952;
+  --primary-low-mid-or-secondary-high: #705C58;
 }
 
 /* Ice (light) */
@@ -528,6 +544,7 @@ html[data-rm-theme="ice"] {
   --primary-700: #2E659D;
   --primary-med-or-secondary-med: #396693;
   --primary-med-or-secondary-high: #396693;
+  --primary-low-mid-or-secondary-high: #4C6580;
 }
 
 /* A colour scheme that is not a brand theme: Discourse's own colours. */

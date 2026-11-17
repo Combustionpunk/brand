@@ -342,7 +342,7 @@ export function discourseVariables(colours: ThemeColours): Record<string, string
  * The derived variables that carry text on the page and on the rows of lists and menus, and why.
  * Found by where core's stylesheets use them as `color:` (core at 3aff54f, 17 Nov 2026).
  *
- * Left out on purpose: `--primary-low-mid` (and `-400`, `-500`, `--primary-low-mid-or-...`), which
+ * Left out on purpose: `--primary-low-mid` (and `-400`, `-500`), which
  * core uses for icons, drag handles, borders, placeholders and disabled controls, none of them
  * text that WCAG asks 4.5:1 of; darkening it to 4.5:1 would also push `-medium` and `-high` darker
  * and flatten the ladder. And `--primary-low`, `--primary-very-low` and the `secondary-*` shades
@@ -359,6 +359,8 @@ export const DISCOURSE_TEXT_SHADES: Readonly<Record<string, string>> = {
   "--primary-med-or-secondary-med": "Text: --primary-medium in light palettes, --secondary-medium in dark (about 40 uses).",
   "--primary-med-or-secondary-high": "Text: the categories page's topic counts and activity; --secondary-high in dark.",
   "--primary-high-or-secondary-low": "Text: --primary-high in light palettes, --secondary-low in dark.",
+  "--primary-low-mid-or-secondary-high":
+    "Text: the categories page's last-activity times, the \"via email\" marker and embedded posts' links. Its own variable, so raising it leaves --primary-low-mid alone.",
 };
 
 /** The ladders whose order the overrides keep: each step at least as far from the page as the one before. */
@@ -386,7 +388,8 @@ export function readableTextShades(vars: Record<string, string>): Record<string,
   for (const name of Object.keys(DISCOURSE_TEXT_SHADES)) {
     const start = vars[name]!;
     if (passes(start)) continue;
-    // The smallest share of the way to primary that passes. Primary itself passes (the tokens' tests).
+    // The smallest share of the way to primary that passes. Primary itself passes on both (the tokens'
+    // and generator's tests); if it ever did not, this would end at primary, the best on offer.
     let [lo, hi] = [0, 1];
     for (let i = 0; i < 20; i++) {
       const mid = (lo + hi) / 2;

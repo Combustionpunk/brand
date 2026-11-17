@@ -1034,7 +1034,8 @@ var DISCOURSE_TEXT_SHADES = {
   "--primary-900": "Topic list headings and metadata, and default button text, in core's newer topic list.",
   "--primary-med-or-secondary-med": "Text: --primary-medium in light palettes, --secondary-medium in dark (about 40 uses).",
   "--primary-med-or-secondary-high": "Text: the categories page's topic counts and activity; --secondary-high in dark.",
-  "--primary-high-or-secondary-low": "Text: --primary-high in light palettes, --secondary-low in dark."
+  "--primary-high-or-secondary-low": "Text: --primary-high in light palettes, --secondary-low in dark.",
+  "--primary-low-mid-or-secondary-high": `Text: the categories page's last-activity times, the "via email" marker and embedded posts' links. Its own variable, so raising it leaves --primary-low-mid alone.`
 };
 var TEXT_LADDERS = [
   ["--primary-medium", "--primary-high", "--primary-very-high"],

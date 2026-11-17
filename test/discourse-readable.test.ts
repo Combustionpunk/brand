@@ -46,7 +46,7 @@ const weakest = (vars: Record<string, string>, name: string) => Math.min(...BACK
 describe("DISCOURSE_TEXT_SHADES: the derived variables that carry text", () => {
   it("lists the grey text shades with a reason for each, and leaves the non-text ones out", () => {
     const names = Object.keys(DISCOURSE_TEXT_SHADES);
-    for (const name of ["--primary-medium", "--primary-high", "--primary-very-high", "--primary-600", "--primary-700", "--primary-800", "--primary-900", "--primary-med-or-secondary-med", "--primary-med-or-secondary-high", "--primary-high-or-secondary-low"]) {
+    for (const name of ["--primary-medium", "--primary-high", "--primary-very-high", "--primary-600", "--primary-700", "--primary-800", "--primary-900", "--primary-med-or-secondary-med", "--primary-med-or-secondary-high", "--primary-high-or-secondary-low", "--primary-low-mid-or-secondary-high"]) {
       expect(names, name).toContain(name);
     }
     // Borders, backgrounds, icons, drag handles and disabled controls: not text.
