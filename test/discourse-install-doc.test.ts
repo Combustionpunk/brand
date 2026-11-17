@@ -51,3 +51,16 @@ describe("docs/discourse-install.md (#9)", () => {
     expect(doc).toMatch(/github\.com\/discourse\/discourse\/blob\/[0-9a-f]{40}\/app\/helpers\/application_helper\.rb/);
   });
 });
+
+describe("docs/discourse-install.md (#13 docs fixes)", () => {
+  it("has no unfilled link placeholders, and links core at a pinned commit, not main", () => {
+    expect(doc).not.toMatch(/\]\(\{[A-Z]\}/);
+    expect(doc).toMatch(/github\.com\/discourse\/discourse\/blob\/[0-9a-f]{40}\/app\/helpers\/application_helper\.rb#L1062-L1063/);
+    expect(doc).not.toMatch(/github\.com\/discourse\/discourse\/(blob|tree)\/main\//);
+  });
+
+  it("tags each publish with the general discourse-vX.Y.Z, not a fixed version", () => {
+    expect(doc).toMatch(/git tag discourse-vX\.Y\.Z discourse-theme-new && git push origin discourse-vX\.Y\.Z/);
+    expect(doc).not.toMatch(/git tag discourse-v\d/);
+  });
+});

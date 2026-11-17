@@ -34,9 +34,11 @@ The RC Misfits look on the forum (Discourse) is a **Discourse theme** built from
    FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --subdirectory-filter discourse discourse-theme-new
    git ls-tree --name-only discourse-theme-new      # about.json etc. at the top, no discourse/
    git push origin discourse-theme-new:discourse-theme   # add --force only if the history was rewritten
-   git tag discourse-v0.4.0 discourse-theme-new && git push origin discourse-v0.4.0
+   git tag discourse-vX.Y.Z discourse-theme-new && git push origin discourse-vX.Y.Z
    git branch -D discourse-theme-new
    ```
+
+   `discourse-vX.Y.Z` is the release being published, e.g. `discourse-v0.4.0`.
 
    - **It uses only git's built-in `filter-branch`**, so it works in a GitHub Codespace, whose git may have no `git subtree` (it is an optional add-on to git). The first publish was done this way (`discourse-theme` at `46c78fa`, tagged `discourse-v0.3.0`, the same tree as `discourse/` on main at `8d71d1b`).
    - **Every release must use this method.** `filter-branch` gives the same commits each time for the same history, so a normal push fast-forwards. `git subtree split` is not guaranteed to give the same ids (it can differ on some histories, for example with merges), so switching method can stop the push fast-forwarding.
@@ -90,7 +92,7 @@ Make each of the 17 `RC Misfits: …` palettes user-selectable (the admin calls 
 - [`ApplicationHelper#user_scheme_id` and `#user_dark_scheme_id`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/helpers/application_helper.rb#L688-L726) use a member's saved palette only if it is `user_selectable: true` (or is the theme's default). Otherwise the page loads the theme's default.
 - [`SiteSerializer#user_color_schemes`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/serializers/site_serializer.rb#L100-L116) offers theme-owned palettes when the modifier is on, whatever the flag. That is why the dropdown offers palettes the server then ignores.
 - [`RemoteTheme#update_theme_color_schemes`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/models/remote_theme.rb#L549-L620) builds new palettes with the column's default, `false`, and nothing in `about.json` can set it. A theme cannot set the flag itself.
-- The member's choice reaches the page as `user_color_scheme_id: user_scheme_id || -1` ([`ApplicationHelper`]({B}/app/helpers/application_helper.rb#L1062-L1063)), which is why an ignored choice shows as a blank dropdown (below).
+- The member's choice reaches the page as `user_color_scheme_id: user_scheme_id || -1` ([`ApplicationHelper`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/helpers/application_helper.rb#L1062-L1063)), which is why an ignored choice shows as a blank dropdown (below).
 - [`ColorSchemeRevisor`](https://github.com/discourse/discourse/blob/9de20dea352c045d9954574c250d17aa5fcd4c4a/app/services/color_scheme_revisor.rb) sets `user_selectable` on the same row; only a change of **colours** calls `diverge_from_remote` and makes a copy.
 - The member theme picker (plugin #407, `DesMemberTheme.scheme_for`) also looks for `user_selectable: true`, so it needs this step too.
 

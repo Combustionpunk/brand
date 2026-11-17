@@ -73,3 +73,23 @@ export declare function schemeIdFromColours(colours: Partial<Record<string, stri
  * defined as `var(...)` of these are left out: they follow by themselves.
  */
 export declare function discourseVariables(colours: ThemeColours): Record<string, string>;
+/**
+ * The derived variables that carry text on the page and on the rows of lists and menus, and why.
+ * Found by where core's stylesheets use them as `color:` (core at 3aff54f, 17 Nov 2026).
+ *
+ * Left out on purpose: `--primary-low-mid` (and `-400`, `-500`), which
+ * core uses for icons, drag handles, borders, placeholders and disabled controls, none of them
+ * text that WCAG asks 4.5:1 of; darkening it to 4.5:1 would also push `-medium` and `-high` darker
+ * and flatten the ladder. And `--primary-low`, `--primary-very-low` and the `secondary-*` shades
+ * on their own, which are backgrounds and borders.
+ */
+export declare const DISCOURSE_TEXT_SHADES: Readonly<Record<string, string>>;
+/**
+ * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page or the hover
+ * row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
+ * The ladders keep their order: a step that would end up nearer the page than the one before it
+ * takes that step's colour.
+ */
+export declare function readableTextShades(vars: Record<string, string>): Record<string, string>;
+/** `discourseVariables` with the readable text shades: what the forum sets for a theme. */
+export declare function forumVariables(colours: ThemeColours): Record<string, string>;
