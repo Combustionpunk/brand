@@ -1,12 +1,14 @@
-// RC Misfits theme: the shared top bar and the brand theme that matches the member's
-// colour scheme. Generated from Combustionpunk/brand (src/discourse-theme/): do not edit here.
+// RC Misfits theme: the shared top bar, the brand theme that matches the member's colour
+// scheme, and Match my car. Generated from Combustionpunk/brand (src/discourse-theme/): do not
+// edit here.
 import Component from "@glimmer/component";
 import { on } from "@ember/modifier";
 import { action } from "@ember/object";
+import { addObserver } from "@ember/object/observers";
 import { getOwner } from "@ember/owner";
 import { service } from "@ember/service";
 import { apiInitializer } from "discourse/lib/api";
-import { watchForumTheme } from "../lib/rm-brand";
+import { matchMyCarColours, watchForumTheme } from "../lib/rm-brand";
 
 class RmForumHeader extends Component {
   @service currentUser;
@@ -52,6 +54,16 @@ class RmForumHeader extends Component {
 }
 
 export default apiInitializer((api) => {
-  watchForumTheme(document);
+  // Match my car (brand #11): the plugin puts the member's switch and race colours on the current
+  // user (discourse-event-system #456). This runs before the forum first renders.
+  const user = api.getCurrentUser();
+  const watcher = watchForumTheme(document, {
+    matchMyCar: () => matchMyCarColours(user),
+  });
+  // The plugin's switch sets des_match_my_car on the current user when it saves: repaint then.
+  if (user) {
+    addObserver(user, "des_match_my_car", watcher.refresh);
+    addObserver(user, "des_race_colours", watcher.refresh);
+  }
   api.renderInOutlet("above-site-header", RmForumHeader);
 });
