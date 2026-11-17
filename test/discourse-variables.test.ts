@@ -42,12 +42,13 @@ function parseColour(value: string): Rgba | undefined {
   return [channel(fn[1]!), channel(fn[2]!), channel(fn[3]!), fn[4] === undefined ? 1 : parseFloat(fn[4])];
 }
 
-/** Variables that are the same in every palette, or are light-dark() helpers with generated names. */
+/** Variables that are the same in every palette, fonts, or light-dark() helpers with generated names. */
 const isConstant = (name: string, value: string) =>
   value.includes("var(") ||
   /^--[0-9a-f]{8}-csstools/.test(name) ||
   /^--(google|instagram|facebook|cas|twitter|github|discord|gold|silver|bronze)(-hover)?$/.test(name) ||
-  name === "--always-black-rgb" ||
+  /font-family/.test(name) ||
+  ["--always-black-rgb", "--shadow-docked-composer"].includes(name) ||
   name.startsWith("--fc-");
 
 describe("discourseVariables", () => {

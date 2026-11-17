@@ -140,6 +140,9 @@ defineHeader();
 
 // src/colour.ts
 var HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+function isHex(value) {
+  return typeof value === "string" && HEX.test(value.trim());
+}
 function parseHex(hex) {
   const match = typeof hex === "string" ? HEX.exec(hex.trim()) : null;
   if (!match) {
@@ -156,11 +159,97 @@ var clampByte = (v) => Math.min(255, Math.max(0, Math.round(v)));
 function toHex({ r, g, b }) {
   return "#" + [r, g, b].map((v) => clampByte(v).toString(16).padStart(2, "0")).join("").toUpperCase();
 }
+function normaliseHex(hex) {
+  return toHex(parseHex(hex));
+}
 function mix(from, to, share) {
   const a = parseHex(from);
   const b = parseHex(to);
   const w = Math.min(1, Math.max(0, share));
   return toHex({ r: a.r + (b.r - a.r) * w, g: a.g + (b.g - a.g) * w, b: a.b + (b.b - a.b) * w });
+}
+function rgbToHsl({ r, g, b }) {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (d === 0) {
+    return { h: 0, s: 0, l };
+  }
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h;
+  if (max === rn) {
+    h = (gn - bn) / d % 6;
+  } else if (max === gn) {
+    h = (bn - rn) / d + 2;
+  } else {
+    h = (rn - gn) / d + 4;
+  }
+  h *= 60;
+  if (h < 0) {
+    h += 360;
+  }
+  return { h, s, l };
+}
+function hslToRgb({ h, s, l }) {
+  const hue = (h % 360 + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(hue / 60 % 2 - 1));
+  const m = l - c / 2;
+  const [r, g, b] = hue < 60 ? [c, x, 0] : hue < 120 ? [x, c, 0] : hue < 180 ? [0, c, x] : hue < 240 ? [0, x, c] : hue < 300 ? [x, 0, c] : [c, 0, x];
+  return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
+}
+var hexToHsl = (hex) => rgbToHsl(parseHex(hex));
+var hslToHex = (hsl) => toHex(hslToRgb(hsl));
+function chroma(hex) {
+  const { r, g, b } = parseHex(hex);
+  return (Math.max(r, g, b) - Math.min(r, g, b)) / 255;
+}
+function luminance(hex) {
+  const { r, g, b } = parseHex(hex);
+  const lin = (v) => {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function contrast(a, b) {
+  const la = luminance(a);
+  const lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+// src/types.ts
+var THEME_KEYS = [
+  "bg",
+  "surface",
+  "surface2",
+  "line",
+  "text",
+  "muted",
+  "accent",
+  "onAccent",
+  "good",
+  "goodText",
+  "pb",
+  "fast",
+  "danger",
+  "warning"
+];
+
+// src/css.ts
+var kebab = (name) => name.replace(/_/g, "-").replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+function cssVarName(key) {
+  return `--rm-${kebab(key)}`;
+}
+function themeMode(colours) {
+  return contrast(colours.bg, "#000000") < contrast(colours.bg, "#FFFFFF") ? "dark" : "light";
+}
+function themeDeclarations(colours) {
+  return [`color-scheme: ${themeMode(colours)};`, ...THEME_KEYS.map((key) => `${cssVarName(key)}: ${colours[key]};`)];
 }
 
 // tokens.json
@@ -758,7 +847,7 @@ function toDiscourseScheme(id, theme) {
     ])
   };
 }
-function normaliseHex(value) {
+function normaliseHex2(value) {
   const hex = (value ?? "").trim().replace(/^#/, "").toUpperCase();
   if (!/^(?:[0-9A-F]{3,4}|[0-9A-F]{6}|[0-9A-F]{8})$/.test(hex)) return void 0;
   const long = hex.length <= 4 ? [...hex].map((digit) => digit + digit).join("") : hex;
@@ -769,15 +858,346 @@ function schemeIdFromColours(colours, schemes = themes) {
   const names = Object.keys(DISCOURSE_MAPPING);
   for (const [id, theme] of Object.entries(schemes)) {
     const { colors } = toDiscourseScheme(id, theme);
-    if (names.every((name) => normaliseHex(colours[name]) === colors[name])) {
+    if (names.every((name) => normaliseHex2(colours[name]) === colors[name])) {
       return id;
     }
   }
   return void 0;
 }
+var channels = (hex) => {
+  const n = parseInt(hex.replace(/^#/, ""), 16);
+  return { r: n >> 16 & 255, g: n >> 8 & 255, b: n & 255 };
+};
+var byte = (v) => Math.min(255, Math.max(0, Math.round(v)));
+var hexOf = ({ r, g, b }) => "#" + [r, g, b].map((v) => byte(v).toString(16).padStart(2, "0")).join("").toUpperCase();
+var listOf = ({ r, g, b }) => [r, g, b].map(byte).join(", ");
+function toHsl({ r, g, b }) {
+  const [rn, gn, bn] = [r / 255, g / 255, b / 255];
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  const d = max - min;
+  if (d === 0) return { h: 0, s: 0, l };
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h = max === rn ? (gn - bn) / d % 6 : max === gn ? (bn - rn) / d + 2 : (rn - gn) / d + 4;
+  h *= 60;
+  return { h: h < 0 ? h + 360 : h, s, l };
+}
+function fromHsl({ h, s, l }) {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(h / 60 % 2 - 1));
+  const m = l - c / 2;
+  const [r, g, b] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
+}
+var clamp01 = (v) => Math.min(1, Math.max(0, v));
+function scaleLightness(c, p) {
+  const hsl = toHsl(c);
+  return fromHsl({ ...hsl, l: p > 0 ? hsl.l + (1 - hsl.l) * p : hsl.l + hsl.l * p });
+}
+var adjustLightness = (c, by) => {
+  const hsl = toHsl(c);
+  return fromHsl({ ...hsl, l: clamp01(hsl.l + by) });
+};
+var desaturate = (c, by) => {
+  const hsl = toHsl(c);
+  return fromHsl({ ...hsl, s: clamp01(hsl.s - by) });
+};
+var brightness = ({ r, g, b }) => r * 0.299 + g * 0.587 + b * 0.114;
+var diff = (c, comparison, lighter, darker) => scaleLightness(c, brightness(c) < brightness(comparison) ? lighter : darker);
+function srgbScale(fg, bg, share) {
+  const mixChannel = (f, b) => Math.sqrt(f * f * share + b * b * (1 - share));
+  return { r: mixChannel(fg.r, bg.r), g: mixChannel(fg.g, bg.g), b: mixChannel(fg.b, bg.b) };
+}
+function discourseVariables(colours) {
+  const { colors } = toDiscourseScheme("", { name: "", mode: themeMode(colours), colours });
+  const c = Object.fromEntries(Object.entries(colors).map(([name, hex]) => [name, channels(hex)]));
+  const { primary, secondary, tertiary, quaternary, header_background, header_primary, highlight, danger, success, love } = c;
+  const light = brightness(primary) < brightness(secondary);
+  const choose = (ifLight, ifDark) => light ? ifLight : ifDark;
+  const shade = (base, against, steps) => Object.fromEntries(Object.entries(steps).map(([name, [up, down]]) => [name, diff(base, against, up, down)]));
+  const p = shade(primary, secondary, {
+    "very-low": [0.97, -0.82],
+    low: [0.9, -0.78],
+    "low-mid": [0.7, -0.45],
+    medium: [0.5, -0.35],
+    high: [0.3, -0.25],
+    "very-high": [0.15, -0.1],
+    "50": [0.97, -0.82],
+    "100": [0.94, -0.8],
+    "200": [0.9, -0.78],
+    "300": [0.8, -0.6],
+    "400": [0.7, -0.45],
+    "500": [0.6, -0.4],
+    "600": [0.5, -0.35],
+    "700": [0.38, -0.3],
+    "800": [0.3, -0.25],
+    "900": [0.15, -0.1]
+  });
+  const s = shade(secondary, primary, { low: [0.7, -0.7], medium: [0.5, -0.5], high: [0.3, -0.35], "very-high": [0.07, -0.07] });
+  const t = shade(tertiary, secondary, {
+    "very-low": [0.9, -0.75],
+    low: [0.85, -0.65],
+    medium: [0.5, -0.45],
+    high: [0.2, -0.25],
+    "25": [0.93, -0.8],
+    "50": [0.9, -0.75],
+    "100": [0.88, -0.72],
+    "200": [0.87, -0.69],
+    "300": [0.85, -0.65],
+    "400": [0.74, -0.58],
+    "500": [0.63, -0.52],
+    "600": [0.5, -0.45],
+    "700": [0.4, -0.38],
+    "800": [0.3, -0.31],
+    "900": [0.2, -0.25]
+  });
+  t["hover"] = choose(diff(tertiary, secondary, -0.25, -0.25), diff(tertiary, primary, 0.2, 0.7));
+  const hp = Object.fromEntries(
+    Object.entries({ low: 0.1, "low-mid": 0.35, medium: 0.55, high: 0.7, "very-high": 0.9 }).map(([name, share]) => [
+      name,
+      srgbScale(header_primary, header_background, share)
+    ])
+  );
+  const h = shade(highlight, secondary, { bg: [0.7, -0.8], low: [0.7, -0.8], medium: [0.5, -0.55], high: [-0.5, -0.1] });
+  const d = shade(danger, secondary, { low: [0.9, -0.68], "low-mid": [0.5, -0.6], medium: [0.3, -0.35], hover: [-0.2, -0.2] });
+  const ok = shade(success, secondary, { "very-low": [0.9, -0.7], low: [0.8, -0.6], medium: [0.5, -0.4], hover: [-0.2, -0.2] });
+  const out = {
+    "--csstools-color-scheme--light": choose("initial", ""),
+    "--scheme-type": choose("light", "dark")
+  };
+  const set = (name, value) => out[name] = hexOf(value);
+  for (const [name, value] of Object.entries(c)) {
+    set(name === "hover" ? "--d-hover" : name === "selected" ? "--d-selected" : `--${name}`, value);
+  }
+  set("--d-selected-hover", diff(c.selected, secondary, 0.2, 0.2));
+  for (const [name, value] of Object.entries({ primary, secondary, header_background, tertiary, highlight, success })) {
+    out[`--${name}-rgb`] = listOf(value);
+  }
+  out["--primary-low-rgb"] = listOf(p["low"]);
+  out["--primary-very-low-rgb"] = listOf(p["very-low"]);
+  for (const [prefix, group] of [["primary", p], ["header_primary", hp], ["secondary", s], ["tertiary", t], ["highlight", h], ["danger", d], ["success", ok]]) {
+    for (const [name, value] of Object.entries(group)) set(`--${prefix}-${name}`, value);
+  }
+  out["--danger-low-mid"] = `rgba(${listOf(d["low-mid"])}, 0.7)`;
+  set("--quaternary-low", diff(quaternary, secondary, 0.7, -0.7));
+  set("--love-low", diff(love, secondary, 0.85, -0.6));
+  out["--wiki"] = "green";
+  set("--blend-primary-secondary-5", srgbScale(primary, secondary, 0.05));
+  set("--primary-med-or-secondary-med", choose(p["medium"], s["medium"]));
+  set("--primary-med-or-secondary-high", choose(p["medium"], s["high"]));
+  set("--primary-high-or-secondary-low", choose(p["high"], s["low"]));
+  set("--primary-low-mid-or-secondary-high", choose(p["low-mid"], s["high"]));
+  set("--primary-low-mid-or-secondary-low", choose(p["low-mid"], s["low"]));
+  set("--primary-or-primary-low-mid", choose(primary, p["low-mid"]));
+  set("--highlight-low-or-medium", choose(h["low"], h["medium"]));
+  set("--tertiary-or-tertiary-low", choose(tertiary, t["low"]));
+  set("--tertiary-low-or-tertiary-high", choose(t["low"], t["high"]));
+  set("--topic-timeline-border-color", choose(t["low"], t["high"]));
+  set("--tertiary-med-or-tertiary", choose(t["medium"], tertiary));
+  set("--secondary-or-primary", choose(secondary, primary));
+  out["--tertiary-or-white"] = choose(hexOf(tertiary), "#FFFFFF");
+  out["--facebook-or-white"] = choose("#0866FF", "#FFFFFF");
+  out["--twitter-or-white"] = choose("#000000", "#FFFFFF");
+  const code = choose(
+    { attr: "#015692", attribute: "#803378", addition: "#2f6f44", deletion: "#c02d2e", keyword: "#015692", title: "#b75501", name: "#b75501", punctuation: "#535a60", symbol: "#54790d", variable: "#54790d", string: "#54790d" },
+    { attr: "#88aece", attribute: "#c59bc1", addition: "#76c490", deletion: "#de7176", keyword: "#88aece", title: "#f08d49", name: "#f08d49", punctuation: "#ccc", symbol: "#b5bd68", variable: "#b5bd68", string: "#b5bd68" }
+  );
+  for (const [name, value] of Object.entries(code)) out[`--hljs-${name}`] = value;
+  const codeBg = choose(hexOf(p["100"]), "rgba(0, 0, 0, 0.35)");
+  out["--inline-code-bg"] = codeBg;
+  out["--hljs-bg"] = codeBg;
+  set("--hljs-comment", p["500"]);
+  const shadow = (light2, dark) => `rgba(0, 0, 0, ${choose(light2, dark)})`;
+  out["--shadow-modal"] = `0 8px 60px ${shadow(0.6, 1)}`;
+  out["--shadow-composer"] = `0 -1px 40px ${shadow(0.22, 0.45)}`;
+  out["--shadow-card"] = `0 4px 14px ${shadow(0.15, 0.5)}`;
+  out["--shadow-dropdown"] = `0 2px 12px 0 ${shadow(0.1, 0.25)}`;
+  out["--shadow-footer-nav"] = `0 0 2px 0 ${shadow(0.2, 0.4)}`;
+  out["--chat-skeleton-animation-rgb"] = listOf(p["50"]);
+  set("--calendar-normal", choose(adjustLightness(tertiary, 0.55), adjustLightness(tertiary, -0.25)));
+  set("--calendar-close-to-working-hours", choose(desaturate(adjustLightness(tertiary, 0.45), 0.15), adjustLightness(tertiary, -0.15)));
+  set("--calendar-in-working-hours", choose(desaturate(adjustLightness(tertiary, 0.4), 0.2), adjustLightness(tertiary, -0.1)));
+  return out;
+}
 
 // src/discourse-theme.ts
 var FORUM_THEME_ATTRIBUTE = "data-rm-theme";
+
+// src/contrast.ts
+var MIN_TEXT_CONTRAST = 4.5;
+var MIN_LIGHTNESS_SEPARATION = 1.25;
+
+// src/generate.ts
+var NEUTRAL_CHROMA = 0.12;
+var MAX_TINT_SATURATION = 0.4;
+var ACCENT_TINT_SATURATION = 0.1;
+var GROUND = {
+  dark: { bg: 0.08, surface: 0.12, surface2: 0.16, line: 0.22 },
+  light: { bg: 0.97, surface: 1, surface2: 0.945, line: 0.87 }
+};
+var FIXED = {
+  dark: { pb: "#4CC38A", good: "#1F4D36", goodText: "#9BF0C4", danger: "#FF6B5E", warning: "#FFB648" },
+  light: { pb: "#1F8A55", good: "#DDF3E6", goodText: "#1E5A3A", danger: "#B42318", warning: "#8F5B00" }
+};
+var DANGER_HUE = 4;
+var DANGER_ALT_HUE = 335;
+var PB_HUE = hexToHsl(FIXED.dark.pb).h;
+var hueDistance = (a, b) => {
+  const d = Math.abs(a - b) % 360;
+  return d > 180 ? 360 - d : d;
+};
+function pickRoles(colours = []) {
+  if (!Array.isArray(colours)) {
+    throw new RangeError("Colours must be an array of up to three hex colours.");
+  }
+  const chromatic = [...new Set(colours.slice(0, 3).map(normaliseHex))].filter(
+    (hex) => chroma(hex) >= NEUTRAL_CHROMA
+  );
+  const roles = {};
+  if (chromatic.length === 0) {
+    return roles;
+  }
+  let accentAt = 0;
+  chromatic.forEach((hex, i) => {
+    if (chroma(hex) > chroma(chromatic[accentAt])) {
+      accentAt = i;
+    }
+  });
+  roles.accent = chromatic[accentAt];
+  const rest = chromatic.filter((_, i) => i !== accentAt);
+  if (rest.length === 0) {
+    return roles;
+  }
+  let tintAt = 0;
+  rest.forEach((hex, i) => {
+    if (hexToHsl(hex).l < hexToHsl(rest[tintAt]).l) {
+      tintAt = i;
+    }
+  });
+  roles.tint = rest[tintAt];
+  const third = rest.find((_, i) => i !== tintAt);
+  if (third !== void 0) {
+    roles.fast = third;
+  }
+  return roles;
+}
+function reach(hex, grounds, mode, min = MIN_TEXT_CONTRAST) {
+  const step = mode === "dark" ? 5e-3 : -5e-3;
+  const hsl = hexToHsl(hex);
+  let out = normaliseHex(hex);
+  while (grounds.some((ground) => contrast(out, ground) < min) && hsl.l > 0 && hsl.l < 1) {
+    hsl.l = Math.min(1, Math.max(0, hsl.l + step));
+    out = hslToHex(hsl);
+  }
+  return out;
+}
+function separate(hex, other, mode) {
+  return reach(hex, [other], mode, MIN_LIGHTNESS_SEPARATION);
+}
+function statusColours(grounds, mode, accent) {
+  const base = FIXED[mode];
+  const dangerHsl = hexToHsl(base.danger);
+  if (accent !== void 0 && chroma(accent) >= NEUTRAL_CHROMA && hueDistance(hexToHsl(accent).h, DANGER_HUE) < 25) {
+    dangerHsl.h = DANGER_ALT_HUE;
+  }
+  let danger = reach(hslToHex(dangerHsl), grounds, mode);
+  let warning = reach(base.warning, grounds, mode);
+  if (mode === "dark") {
+    warning = separate(warning, danger, mode);
+  } else {
+    danger = separate(danger, warning, mode);
+  }
+  return { danger, warning };
+}
+function accessible(raw, mode) {
+  const grounds = [raw.bg, raw.surface, raw.surface2];
+  const pb = reach(raw.pb, grounds, mode);
+  const accent = reach(raw.accent, grounds, mode);
+  let danger = reach(raw.danger, grounds, mode);
+  let warning = reach(raw.warning, grounds, mode);
+  if (mode === "dark") {
+    warning = separate(warning, danger, mode);
+  } else {
+    danger = separate(danger, warning, mode);
+  }
+  return {
+    ...raw,
+    text: reach(raw.text, grounds, mode),
+    muted: reach(raw.muted, grounds, mode),
+    accent,
+    onAccent: contrast(raw.onAccent, accent) >= MIN_TEXT_CONTRAST ? raw.onAccent : contrast("#FFFFFF", accent) >= contrast(raw.bg, accent) ? "#FFFFFF" : raw.bg,
+    goodText: reach(raw.goodText, [raw.good], mode),
+    pb,
+    fast: separate(reach(raw.fast, grounds, mode), pb, mode),
+    danger,
+    warning
+  };
+}
+function fallback(mode) {
+  const id = mode === "dark" ? tokens.defaultTheme : tokens.defaultLightTheme;
+  return accessible({ ...tokens.themes[id].colours }, mode);
+}
+function themeFromRoles(roles, mode = "dark") {
+  if (mode !== "dark" && mode !== "light") {
+    throw new RangeError(`Not a theme mode: ${String(mode)}`);
+  }
+  if (roles.accent === void 0) {
+    return fallback(mode);
+  }
+  const accentIn = normaliseHex(roles.accent);
+  const accentHsl = hexToHsl(accentIn);
+  let tint;
+  if (roles.tint !== void 0) {
+    const { h, s } = hexToHsl(roles.tint);
+    tint = { h, s: Math.min(s, MAX_TINT_SATURATION) };
+  } else {
+    tint = { h: accentHsl.h, s: Math.min(accentHsl.s, ACCENT_TINT_SATURATION) };
+  }
+  const levels = GROUND[mode];
+  const bg = hslToHex({ ...tint, l: levels.bg });
+  const surface = hslToHex({ ...tint, l: levels.surface });
+  const surface2 = hslToHex({ ...tint, l: levels.surface2 });
+  const line = hslToHex({ ...tint, l: levels.line });
+  const text = hslToHex({
+    h: tint.h,
+    s: Math.min(tint.s, mode === "dark" ? 0.25 : 0.5),
+    l: mode === "dark" ? 0.95 : 0.13
+  });
+  const muted = hslToHex({ h: tint.h, s: Math.min(tint.s, 0.25), l: mode === "dark" ? 0.7 : 0.38 });
+  let fast;
+  if (roles.fast !== void 0) {
+    fast = normaliseHex(roles.fast);
+  } else {
+    let h = (accentHsl.h + 180) % 360;
+    if (hueDistance(h, PB_HUE) < 30) {
+      h = (PB_HUE + 60) % 360;
+    }
+    fast = hslToHex({ h, s: Math.max(accentHsl.s, 0.7), l: accentHsl.l });
+  }
+  const fixed = FIXED[mode];
+  return accessible(
+    {
+      bg,
+      surface,
+      surface2,
+      line,
+      text,
+      muted,
+      accent: accentIn,
+      onAccent: mode === "dark" ? bg : "#FFFFFF",
+      good: fixed.good,
+      goodText: fixed.goodText,
+      pb: fixed.pb,
+      fast,
+      ...statusColours([bg, surface, surface2], mode, accentIn)
+    },
+    mode
+  );
+}
+function generateTheme(colours = [], mode = "dark") {
+  return themeFromRoles(pickRoles(colours), mode);
+}
 
 // src/discourse-theme/forum.ts
 defineHeader();
@@ -791,11 +1211,46 @@ function syncForumTheme(root, read = (p) => getComputedStyle(root).getPropertyVa
   }
   return id;
 }
-function watchForumTheme(doc = document) {
+var MATCH_MY_CAR_THEME = "match-my-car";
+var MATCH_MY_CAR_STYLE_ID = "rm-match-my-car";
+function matchMyCarColours(user) {
+  if (user?.des_match_my_car !== true || !Array.isArray(user.des_race_colours)) return void 0;
+  const colours = user.des_race_colours.filter(isHex).slice(0, 3);
+  return colours.length > 0 ? colours : void 0;
+}
+function matchMyCarCss(colours, mode) {
+  const theme = generateTheme(colours, mode);
+  const lines = [
+    ...themeDeclarations(theme),
+    ...Object.entries(discourseVariables(theme)).map(([name, value]) => `${name}: ${value};`)
+  ];
+  return `html[${FORUM_THEME_ATTRIBUTE}="${MATCH_MY_CAR_THEME}"] {
+${lines.map((line) => `  ${line}`).join("\n")}
+}
+`;
+}
+function watchForumTheme(doc = document, options = {}) {
   const root = doc.documentElement;
-  const sync = () => syncForumTheme(root);
-  sync();
   const media = doc.defaultView?.matchMedia?.("(prefers-color-scheme: dark)");
+  const read = options.read ?? ((p) => getComputedStyle(root).getPropertyValue(p));
+  const sync = () => {
+    const colours = options.matchMyCar?.();
+    let style = doc.getElementById(MATCH_MY_CAR_STYLE_ID);
+    if (colours === void 0) {
+      style?.remove();
+      syncForumTheme(root, read);
+      return;
+    }
+    const css = matchMyCarCss(colours, media?.matches === false ? "light" : "dark");
+    if (style === null) {
+      style = doc.createElement("style");
+      style.id = MATCH_MY_CAR_STYLE_ID;
+    }
+    if (style.textContent !== css) style.textContent = css;
+    if (style.parentNode !== doc.head) doc.head.append(style);
+    if (root.getAttribute(FORUM_THEME_ATTRIBUTE) !== MATCH_MY_CAR_THEME) root.setAttribute(FORUM_THEME_ATTRIBUTE, MATCH_MY_CAR_THEME);
+  };
+  sync();
   media?.addEventListener("change", sync);
   const onLoad = (event) => {
     if (event.target instanceof HTMLLinkElement) sync();
@@ -803,13 +1258,20 @@ function watchForumTheme(doc = document) {
   doc.addEventListener("load", onLoad, true);
   const observer = new MutationObserver(sync);
   observer.observe(doc.head, { childList: true, subtree: true, attributes: true, attributeFilter: ["media", "href", "disabled"] });
-  return () => {
-    media?.removeEventListener("change", sync);
-    doc.removeEventListener("load", onLoad, true);
-    observer.disconnect();
+  return {
+    refresh: sync,
+    stop() {
+      media?.removeEventListener("change", sync);
+      doc.removeEventListener("load", onLoad, true);
+      observer.disconnect();
+    }
   };
 }
 export {
+  MATCH_MY_CAR_STYLE_ID,
+  MATCH_MY_CAR_THEME,
+  matchMyCarColours,
+  matchMyCarCss,
   syncForumTheme,
   watchForumTheme
 };
