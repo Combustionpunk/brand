@@ -43,9 +43,9 @@ export interface CanvasTheme {
  */
 export const BOARD_AMENDED: Record<string, Partial<CanvasTheme["colours"]>> = {
   // Accents darkened again on 17 Nov 2026 (#15) so links reach 4.5:1 on the forum's hover row:
-  // Pit Lane light #946700, Ice #0275BA.
+  // Pit Lane light #946700, Synthwave light #C2187A, Ice #0275BA.
   "pit-lane-light": { accent: "#7F5A05", pb: "#1C7E4D" }, // canvas #B07A00, #1F8A55
-  "synthwave-light": { pb: "#127F55" }, // canvas #13865A
+  "synthwave-light": { accent: "#B41774", pb: "#127F55" }, // canvas #C2187A (darkened in #15), #13865A
   ice: { accent: "#0467A3", pb: "#148150" }, // canvas #0277BD, #158A55
 };
 

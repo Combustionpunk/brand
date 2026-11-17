@@ -20,3 +20,8 @@ export interface ContrastFailure {
 }
 /** The pairs of a theme that miss their contrast requirement. Empty means the theme passes. */
 export declare function contrastFailures(colours: ThemeColours): ContrastFailure[];
+/**
+ * `from` moved towards `to` in 1% steps (sRGB, as `mix`), by the fewest steps that make `passes`
+ * true: `from` itself if it already passes, `to` if nothing short of it does.
+ */
+export declare function smallestMix(from: string, to: string, passes: (hex: string) => boolean): string;

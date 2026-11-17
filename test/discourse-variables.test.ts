@@ -7,7 +7,7 @@ import { MIN_TEXT_CONTRAST } from "../src/contrast.ts";
 import { discourseVariables, toDiscourseScheme } from "../src/discourse.ts";
 import { generateTheme } from "../src/generate.ts";
 import { themes } from "../src/tokens.ts";
-import type { ThemeMode } from "../src/types.ts";
+import type { ThemeColours, ThemeMode } from "../src/types.ts";
 import { CARS } from "./fixtures/cars.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -52,13 +52,23 @@ const isConstant = (name: string, value: string) =>
   ["--always-black-rgb", "--shadow-docked-composer"].includes(name) ||
   name.startsWith("--fc-");
 
+/** Base colours that changed after a fixture was compiled. */
+const FIXTURE_COLOURS: Record<string, Partial<ThemeColours>> = { "pit-lane-light": { accent: "#946700" } };
+/** The row colours (`hover`, `selected`) and the one core derives from `selected`. */
+const ROW_VARIABLES = ["--d-hover", "--d-selected", "--d-selected-hover"];
+
 describe("discourseVariables", () => {
   for (const id of ["pit-lane", "pit-lane-light"]) {
     it(`gives what Discourse itself compiles for ${id}, to within one step per channel`, () => {
       const compiled = fixture(id);
-      const ours = discourseVariables(themes[id]!.colours);
+      // The fixtures were compiled before #15 darkened Pit Lane light's accent; give the colours they were made from.
+      // The two row colours are the brand's choice, not core's sums, and #15 changed how they are picked.
+      const colours = { ...themes[id]!.colours, ...FIXTURE_COLOURS[id] };
+      const ours = discourseVariables(colours);
 
-      const wanted = [...compiled].filter(([name, value]) => !isConstant(name, value)).map(([name]) => name);
+      const wanted = [...compiled]
+        .filter(([name, value]) => !isConstant(name, value) && !ROW_VARIABLES.includes(name))
+        .map(([name]) => name);
       expect(wanted.length).toBeGreaterThan(100);
       expect(wanted.filter((name) => !(name in ours))).toEqual([]);
 

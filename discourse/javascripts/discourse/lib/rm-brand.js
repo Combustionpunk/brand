@@ -255,6 +255,13 @@ function themeDeclarations(colours) {
 // src/contrast.ts
 var MIN_TEXT_CONTRAST = 4.5;
 var MIN_LIGHTNESS_SEPARATION = 1.25;
+function smallestMix(from, to, passes) {
+  for (let step = 0; step < 100; step++) {
+    const hex = mix(from, to, step / 100);
+    if (passes(hex)) return hex;
+  }
+  return mix(from, to, 1);
+}
 
 // tokens.json
 var tokens_default = {
@@ -293,7 +300,7 @@ var tokens_default = {
         line: "#DEDBD2",
         text: "#1B1C1F",
         muted: "#5C5F66",
-        accent: "#946700",
+        accent: "#7F5A05",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -335,7 +342,7 @@ var tokens_default = {
         line: "#E2D5EC",
         text: "#22123A",
         muted: "#5E4B78",
-        accent: "#C2187A",
+        accent: "#B41774",
         onAccent: "#FFFFFF",
         good: "#DCF5EE",
         goodText: "#14584A",
@@ -377,7 +384,7 @@ var tokens_default = {
         line: "#E1DFDB",
         text: "#24221E",
         muted: "#6A6357",
-        accent: "#C04400",
+        accent: "#AC4004",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -419,7 +426,7 @@ var tokens_default = {
         line: "#DFE2DA",
         text: "#22251D",
         muted: "#646C56",
-        accent: "#6A7500",
+        accent: "#606A04",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -461,7 +468,7 @@ var tokens_default = {
         line: "#D5E7DD",
         text: "#182A20",
         muted: "#49795F",
-        accent: "#846B1C",
+        accent: "#77631C",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -503,7 +510,7 @@ var tokens_default = {
         line: "#D1D8EB",
         text: "#141C2E",
         muted: "#495779",
-        accent: "#816901",
+        accent: "#715D08",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -545,7 +552,7 @@ var tokens_default = {
         line: "#DEDEDE",
         text: "#212121",
         muted: "#616161",
-        accent: "#DE0400",
+        accent: "#C70704",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -587,7 +594,7 @@ var tokens_default = {
         line: "#E6D9D6",
         text: "#291C19",
         muted: "#78534A",
-        accent: "#996100",
+        accent: "#875604",
         onAccent: "#FFFFFF",
         good: "#DDF3E6",
         goodText: "#1E5A3A",
@@ -607,7 +614,7 @@ var tokens_default = {
         line: "#D3E1EC",
         text: "#0F2133",
         muted: "#4A6075",
-        accent: "#0275BA",
+        accent: "#0467A3",
         onAccent: "#FFFFFF",
         good: "#DDF3E9",
         goodText: "#165A3F",
@@ -832,9 +839,18 @@ var DISCOURSE_MAPPING = {
 var DISCOURSE_ROW_COLOURS = ["hover", "selected"];
 var SELECTED_ACCENT_SHARE = 0.2;
 function discourseRowColours(colours) {
+  const readable = (row) => [colours.accent, colours.text].every((fg) => contrast(fg, row) >= MIN_TEXT_CONTRAST);
+  let selected = colours.bg;
+  for (let step = SELECTED_ACCENT_SHARE * 200; step > 0; step--) {
+    const tint = mix(colours.bg, colours.accent, step / 200);
+    if (readable(tint)) {
+      selected = tint;
+      break;
+    }
+  }
   return {
-    hover: colours.line,
-    selected: mix(colours.bg, colours.accent, SELECTED_ACCENT_SHARE)
+    hover: smallestMix(colours.line, colours.bg, readable),
+    selected
   };
 }
 function toDiscourseScheme(id, theme) {
@@ -1041,7 +1057,7 @@ var TEXT_LADDERS = [
   ["--primary-medium", "--primary-high", "--primary-very-high"],
   ["--primary-600", "--primary-700", "--primary-800", "--primary-900"]
 ];
-var TEXT_BACKGROUNDS = ["--secondary", "--d-hover"];
+var TEXT_BACKGROUNDS = ["--secondary", "--d-hover", "--d-selected"];
 function readableTextShades(vars) {
   const primary = vars["--primary"];
   const backgrounds = TEXT_BACKGROUNDS.map((name) => vars[name]);
@@ -1161,7 +1177,11 @@ function statusColours(grounds, mode, accent) {
 function accessible(raw, mode) {
   const grounds = [raw.bg, raw.surface, raw.surface2];
   const pb = reach(raw.pb, grounds, mode);
-  const accent = reach(raw.accent, grounds, mode);
+  const text = reach(raw.text, grounds, mode);
+  let accent = reach(raw.accent, grounds, mode);
+  if (mode === "light") {
+    accent = smallestMix(accent, text, (hex) => contrast(hex, raw.line) >= MIN_TEXT_CONTRAST);
+  }
   let danger = reach(raw.danger, grounds, mode);
   let warning = reach(raw.warning, grounds, mode);
   if (mode === "dark") {
@@ -1171,7 +1191,7 @@ function accessible(raw, mode) {
   }
   return {
     ...raw,
-    text: reach(raw.text, grounds, mode),
+    text,
     muted: reach(raw.muted, grounds, mode),
     accent,
     onAccent: contrast(raw.onAccent, accent) >= MIN_TEXT_CONTRAST ? raw.onAccent : contrast("#FFFFFF", accent) >= contrast(raw.bg, accent) ? "#FFFFFF" : raw.bg,
