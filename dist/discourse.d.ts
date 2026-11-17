@@ -65,3 +65,11 @@ export declare function toDiscourseScheme(id: string, theme: Theme): DiscourseSc
  * Only the mapped colours are compared: `hover` and `selected` follow from them.
  */
 export declare function schemeIdFromColours(colours: Partial<Record<string, string>>, schemes?: Record<string, Theme>): string | undefined;
+/**
+ * Every colour variable Discourse defines from a palette, for a theme: `--primary`, `--d-hover`,
+ * `--primary-low`, `--tertiary-rgb`, `--scheme-type` and the rest, as `#RRGGBB` (or `r, g, b` for
+ * the `-rgb` ones). Set them all and the whole forum changes, as if the theme were a palette.
+ * Variables that are the same for every palette (brand colours of other sites, `--gold`) and those
+ * defined as `var(...)` of these are left out: they follow by themselves.
+ */
+export declare function discourseVariables(colours: ThemeColours): Record<string, string>;

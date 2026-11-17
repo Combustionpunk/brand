@@ -251,6 +251,13 @@ describe("the Discourse initializer", () => {
   it("keeps the header in step with the member's colour scheme", () => {
     expect(gjs).toContain("watchForumTheme(");
   });
+
+  it("paints Match my car from the plugin's fields on the current user, and repaints when the switch saves", () => {
+    expect(gjs).toContain("api.getCurrentUser()");
+    expect(gjs).toContain("matchMyCar: () => matchMyCarColours(user)");
+    expect(gjs).toContain('addObserver(user, "des_match_my_car", watcher.refresh)');
+    expect(gjs).toContain('addObserver(user, "des_race_colours", watcher.refresh)');
+  });
 });
 
 describe("the committed discourse/ folder is what the build writes", () => {

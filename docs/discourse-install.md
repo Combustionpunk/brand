@@ -34,7 +34,7 @@ The RC Misfits look on the forum (Discourse) is a **Discourse theme** built from
    FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --subdirectory-filter discourse discourse-theme-new
    git ls-tree --name-only discourse-theme-new      # about.json etc. at the top, no discourse/
    git push origin discourse-theme-new:discourse-theme   # add --force only if the history was rewritten
-   git tag discourse-vX.Y.Z discourse-theme-new && git push origin discourse-vX.Y.Z
+   git tag discourse-v0.4.0 discourse-theme-new && git push origin discourse-v0.4.0
    git branch -D discourse-theme-new
    ```
 
@@ -120,6 +120,16 @@ On a current Discourse, the modifier offers every `RC Misfits: …` palette, and
 
 Once the palettes are user-selectable, a member who has chosen and saved one sees its name, in the light and the dark dropdown.
 
+### Match my car (members' race colours)
+
+With the event-system plugin's **Match my car** switch on in Preferences › Interface (discourse-event-system #456), the forum is painted in colours generated from the member's race colours, light or dark as their device asks. Off, or with no race colours, the member's palettes apply as before.
+
+- **Where the colours come from:** the plugin puts `des_match_my_car` and `des_race_colours` (hex, main first) on the current user. The theme's script runs `generateTheme(colours, mode)` from the brand, so the forum gets exactly the colours Track Studio and Timing get. Race colours that are all white, black or silver give Pit Lane, as on the other sites.
+- **How:** a palette is a fixed row shared by everyone, so this can't be one. The script writes every colour variable Discourse would compile from a palette (`--primary`, `--d-hover`, `--primary-low`, `--tertiary-rgb`... worked out as core's Sass does) and the `--rm-*` tokens into a `<style id="rm-match-my-car">`, under `html[data-rm-theme="match-my-car"]`. That selector beats the `:root` of Discourse's palette stylesheets, so the whole forum and the top bar change.
+- **Turning it on or off** repaints at once: the plugin's switch updates the current user, and the script watches it. A change of race colours on the racing profile shows on the next page load, unless the plugin also updates `des_race_colours` on the current user.
+- **Light or dark** follows the device (`prefers-color-scheme`), and changes with it. The member's palette choices (light, dark, or a forced mode) don't apply while Match my car is on.
+- **The flash on load:** the script runs in the theme's initializer, before Discourse first renders the forum, so the page itself never shows the member's palette. Until then the browser shows Discourse's loading screen, in the palette's background colour. A theme can't do better: its JavaScript only runs once the app has loaded. **No flash at all** needs the plugin to put the same `<style>` (from the brand's `matchMyCarCss`) and `data-rm-theme="match-my-car"` into the page's server-rendered `<head>` for that member, for example with `register_html_builder("server:before-head-close")`. The theme's script would then find them already there and keep them up to date. That is a plugin change, for the Board to decide.
+
 ## Update
 
 - **Admin › Appearance › Themes and components › RC Misfits › Check for updates**, then **Update to latest**. Discourse pulls the `discourse-theme` branch again.
@@ -144,4 +154,6 @@ Before live, on the dev forum:
 5. In Synthwave and in Pit Lane light, open a dropdown (for example Admin › Users › a user › Trust Level): the row under the pointer and the chosen row are both readable.
 6. Sign out from the top bar: you are signed out (Discourse's own logout).
 7. On a phone width (< 640 px), the top bar's menu opens and closes.
-8. Screenshot each step in the PR.
+8. With the event-system plugin: give a member race colours, turn on **Match my car** in Preferences › Interface. The forum and the top bar take the car's colours at once, in light and dark (switch the device), at 1200 and 375 px, and dropdown rows stay readable. Turn it off: the member's palette comes back.
+9. After installing an update, check the palettes are still `user_selectable` (brand #9).
+10. Screenshot each step in the PR.
