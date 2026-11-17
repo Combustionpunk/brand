@@ -146,3 +146,10 @@ describe("the README agrees with the package", () => {
     expect(readme).toContain("safe to GET");
   });
 });
+
+describe("CI", () => {
+  it("fails a PR whose committed dist/ or discourse/ is out of date (pnpm check:dist, #15)", () => {
+    const ci = read(".github/workflows/ci.yml");
+    expect(ci).toMatch(/run: pnpm check:dist/);
+  });
+});

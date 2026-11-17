@@ -42,9 +42,11 @@ export interface CanvasTheme {
  * `bg`, each moved darker in the same hue. The table above keeps the original canvas values.
  */
 export const BOARD_AMENDED: Record<string, Partial<CanvasTheme["colours"]>> = {
-  "pit-lane-light": { accent: "#946700", pb: "#1C7E4D" }, // canvas #B07A00, #1F8A55
+  // Accents darkened again on 17 Nov 2026 (#15) so links reach 4.5:1 on the forum's hover row:
+  // Pit Lane light #946700, Ice #0275BA.
+  "pit-lane-light": { accent: "#7F5A05", pb: "#1C7E4D" }, // canvas #B07A00, #1F8A55
   "synthwave-light": { pb: "#127F55" }, // canvas #13865A
-  ice: { accent: "#0275BA", pb: "#148150" }, // canvas #0277BD, #158A55
+  ice: { accent: "#0467A3", pb: "#148150" }, // canvas #0277BD, #158A55
 };
 
 /** The canvas table, with the Board's amendments applied: what `tokens.json` must hold. */

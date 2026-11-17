@@ -40,7 +40,7 @@ const LADDERS = [
   ["--primary-200", "--primary-300", "--primary-400", "--primary-500", "--primary-600", "--primary-700", "--primary-800", "--primary-900"],
 ];
 
-const BACKGROUNDS = ["--secondary", "--d-hover"] as const;
+const BACKGROUNDS = ["--secondary", "--d-hover", "--d-selected"] as const;
 const weakest = (vars: Record<string, string>, name: string) => Math.min(...BACKGROUNDS.map((bg) => contrast(vars[name]!, vars[bg]!)));
 
 describe("DISCOURSE_TEXT_SHADES: the derived variables that carry text", () => {
@@ -59,7 +59,7 @@ describe("DISCOURSE_TEXT_SHADES: the derived variables that carry text", () => {
 
 describe("the forum's text shades, for every palette and Match my car sample", () => {
   for (const [label, colours] of cases) {
-    it(`${label}: every text shade reaches 4.5:1 on the page and the hover row`, () => {
+    it(`${label}: every text shade reaches 4.5:1 on the page, the hover row and the selected row`, () => {
       const vars = forumVariables(colours);
       for (const name of Object.keys(DISCOURSE_TEXT_SHADES)) {
         for (const bg of BACKGROUNDS) {
