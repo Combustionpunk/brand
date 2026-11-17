@@ -90,9 +90,10 @@ export interface AboutJson {
 /**
  * The theme's `about.json`.
  *
- * `only_theme_color_schemes` makes Discourse offer members exactly this theme's schemes (all of
- * them, with no "Users can select" box to tick), and on a new install take the first dark scheme
- * (Pit Lane) as the dark default and the first light one (Pit Lane light) as the light default.
+ * `only_theme_color_schemes` makes Discourse offer members exactly this theme's schemes, and on a
+ * new install take the first dark scheme (Pit Lane) as the dark default and the first light one
+ * (Pit Lane light) as the light default. A member's saved choice only sticks once an admin makes the
+ * palettes user-selectable, which `about.json` cannot do: see docs/discourse-install.md (#9).
  */
 export function renderAboutJson(tokens: Tokens, fontsCss: string): AboutJson {
   return {
