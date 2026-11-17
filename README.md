@@ -12,7 +12,7 @@ The one source of the RC Misfits look: design tokens, the theme generator, fonts
 ### 1. Install, pinned to a tag
 
 ```sh
-pnpm add github:Combustionpunk/brand#v0.2.0
+pnpm add github:Combustionpunk/brand#v0.3.0
 ```
 
 - The package name is `@rcmisfits/brand`.
@@ -124,7 +124,9 @@ Never recolour, stretch or redraw the logo. Themes change the UI around it, neve
 
 ### 8. The forum (Discourse)
 
-`dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme. The Discourse theme component is a later issue; it will build its `color_schemes` from these files.
+- `dist/discourse/<id>.json` (`@rcmisfits/brand/discourse/<id>.json`) holds a Discourse colour scheme for each theme.
+- `discourse/` is the forum's **Discourse theme** (a full theme: Discourse ignores colour schemes in a component), written by `pnpm build`: every theme as a colour scheme, the fonts, tabular figures, and `<rm-header site="forum">` above Discourse's header. On the forum the brand theme is set as `data-rm-theme` on `<html>`, from the colour scheme the member is seeing.
+- Discourse installs a theme from a repository's root, not a subfolder. Installing, publishing, the defaults and rolling back are in [`docs/discourse-install.md`](docs/discourse-install.md).
 
 ### 9. The shared top bar: `<rm-header>`
 
@@ -195,7 +197,7 @@ React 19 passes these through as attributes. With TypeScript, declare `rm-header
 
 The form is the one the timing site already has (its action and CSRF field stay as they are). The box's local screens do not use the forum links, so they do not use this header.
 
-**The forum (Discourse):** the theme component (a later issue) adds `header.css` to its stylesheet, imports `header.js` in an initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It listens for `rm-sign-out`, calls `preventDefault()`, and uses Discourse's own logout.
+**The forum (Discourse):** the theme in `discourse/` includes `header.css` in its stylesheet, bundles `header.js` with its initializer, and renders `<rm-header site="forum" user="…">` in the `above-site-header` outlet. It handles `rm-sign-in` and `rm-sign-out` with Discourse's own login and logout. See [`docs/discourse-install.md`](docs/discourse-install.md).
 
 `pnpm preview` also writes `preview/header.html` (choose a theme with `?theme=synthwave`).
 
@@ -321,6 +323,10 @@ Every timing number uses figures of equal width, so columns line up and digits d
 | `danger` | `danger` | Errors and delete buttons. |
 | `success` | `pb` | The theme's bright green. |
 | `love` | `danger` | The like heart: the theme's red. |
+| `hover` | `line` | The row under the pointer in dropdowns, menus and the sidebar. |
+| `selected` | `bg` mixed 20% towards `accent` | The chosen row: the page tinted with the accent. |
+
+`hover` and `selected` come from `discourseRowColours(colours)`. Without them Discourse fills in its own light values, which are unreadable in a dark palette. The theme's `text` is at least 4.5:1 on both in every theme (tested).
 
 Hex values have no `#`, as Discourse stores them.
 
@@ -336,9 +342,9 @@ Node 24, pnpm, TypeScript, Vitest.
 |---|---|
 | `pnpm typecheck` | Type-checks `src`, `scripts` and `test`. |
 | `pnpm test` | Runs the tests, including the contrast checks for every theme and for generator output. |
-| `pnpm build` | Writes `dist/` from `tokens.json` and `src/`. |
+| `pnpm build` | Writes `dist/` and `discourse/` from `tokens.json` and `src/`. |
 | `pnpm preview` | Writes `preview/index.html` (every theme's swatches, a top bar, a practice table and buttons) and `preview/header.html` (`<rm-header>` per site). Serve the repo folder over HTTP to view it (`npx serve .`, then open `/preview/`), so the fonts load. |
-| `pnpm check:dist` | Builds, then fails if the committed `dist/` was out of date. |
+| `pnpm check:dist` | Builds, then fails if the committed `dist/` or `discourse/` was out of date. |
 
 - **`tokens.json` is the single source.** Change it, then run `pnpm build` and commit `dist/` with it. A test fails if `dist/tokens.css` or the Discourse schemes do not match `tokens.json`.
 - **Changing any colour is a Board decision.**

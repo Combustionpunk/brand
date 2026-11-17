@@ -51,6 +51,14 @@ export function normaliseHex(hex: string): string {
   return toHex(parseHex(hex));
 }
 
+/** `from` moved towards `to` in sRGB: a `share` of 0 gives `from`, 1 gives `to`. */
+export function mix(from: string, to: string, share: number): string {
+  const a = parseHex(from);
+  const b = parseHex(to);
+  const w = Math.min(1, Math.max(0, share));
+  return toHex({ r: a.r + (b.r - a.r) * w, g: a.g + (b.g - a.g) * w, b: a.b + (b.b - a.b) * w });
+}
+
 export function rgbToHsl({ r, g, b }: Rgb): Hsl {
   const rn = r / 255;
   const gn = g / 255;

@@ -1,0 +1,8 @@
+tracks_url:
+  type: string
+  default: ""
+  description: "Where the Tracks link goes. Empty: https://tracks.rcmisfits.org/. Set it on the dev forum."
+timing_url:
+  type: string
+  default: ""
+  description: "Where the Timing link goes. Empty: https://timing.rcmisfits.org/. Set it on the dev forum."

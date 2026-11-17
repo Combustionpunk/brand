@@ -12,6 +12,8 @@
     "highlight": "D4AF37",
     "danger": "FF6B5E",
     "success": "6FE39A",
-    "love": "FF6B5E"
+    "love": "FF6B5E",
+    "hover": "2A4033",
+    "selected": "36381B"
   }
 }

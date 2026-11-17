@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chroma, contrast, hexToHsl, hslToHex, luminance, normaliseHex, parseHex, toHex } from "../src/colour.ts";
+import { chroma, contrast, hexToHsl, hslToHex, luminance, mix, normaliseHex, parseHex, toHex } from "../src/colour.ts";
 
 describe("colour maths", () => {
   it("parses 6-digit, 3-digit and bare hex", () => {
@@ -41,5 +41,19 @@ describe("colour maths", () => {
     expect(chroma("#111111")).toBe(0);
     expect(chroma("#c0c0c0")).toBe(0);
     expect(chroma("#e6ff00")).toBe(1);
+  });
+});
+
+describe("mix", () => {
+  it("moves from the first colour towards the second by the given share", () => {
+    expect(mix("#000000", "#FFFFFF", 0)).toBe("#000000");
+    expect(mix("#000000", "#FFFFFF", 1)).toBe("#FFFFFF");
+    expect(mix("#000000", "#FFFFFF", 0.5)).toBe("#808080");
+    expect(mix("#17181B", "#FFC72C", 0.2)).toBe("#453B1E");
+  });
+
+  it("keeps the share between 0 and 1, and accepts short hex", () => {
+    expect(mix("#000", "#fff", 2)).toBe("#FFFFFF");
+    expect(mix("#000", "#fff", -1)).toBe("#000000");
   });
 });

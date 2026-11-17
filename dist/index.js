@@ -579,6 +579,12 @@ function toHex({ r, g, b }) {
 function normaliseHex(hex) {
   return toHex(parseHex(hex));
 }
+function mix(from, to, share) {
+  const a = parseHex(from);
+  const b = parseHex(to);
+  const w = Math.min(1, Math.max(0, share));
+  return toHex({ r: a.r + (b.r - a.r) * w, g: a.g + (b.g - a.g) * w, b: a.b + (b.b - a.b) * w });
+}
 function rgbToHsl({ r, g, b }) {
   const rn = r / 255;
   const gn = g / 255;
@@ -877,11 +883,11 @@ function themeMode(colours) {
 function themeToVars(colours) {
   return Object.fromEntries(THEME_KEYS.map((key) => [cssVarName(key), colours[key]]));
 }
-function declarations(colours) {
+function themeDeclarations(colours) {
   return [`color-scheme: ${themeMode(colours)};`, ...THEME_KEYS.map((key) => `${cssVarName(key)}: ${colours[key]};`)];
 }
 function themeToCss(colours, selector) {
-  const lines = declarations(colours);
+  const lines = themeDeclarations(colours);
   if (selector === void 0) {
     return lines.join(" ");
   }
@@ -904,28 +910,59 @@ var DISCOURSE_MAPPING = {
   success: "pb",
   love: "danger"
 };
+var DISCOURSE_ROW_COLOURS = ["hover", "selected"];
+var SELECTED_ACCENT_SHARE = 0.2;
+function discourseRowColours(colours) {
+  return {
+    hover: colours.line,
+    selected: mix(colours.bg, colours.accent, SELECTED_ACCENT_SHARE)
+  };
+}
 function toDiscourseScheme(id, theme) {
   const names = Object.keys(DISCOURSE_MAPPING);
+  const bare = (hex) => hex.replace(/^#/, "").toUpperCase();
+  const rows = discourseRowColours(theme.colours);
   return {
     id,
     name: `RC Misfits: ${theme.name}`,
     dark: theme.mode === "dark",
-    colors: Object.fromEntries(
-      names.map((name) => [name, theme.colours[DISCOURSE_MAPPING[name]].replace(/^#/, "").toUpperCase()])
-    )
+    colors: Object.fromEntries([
+      ...names.map((name) => [name, bare(theme.colours[DISCOURSE_MAPPING[name]])]),
+      ...DISCOURSE_ROW_COLOURS.map((name) => [name, bare(rows[name])])
+    ])
   };
+}
+function normaliseHex2(value) {
+  const hex = (value ?? "").trim().replace(/^#/, "").toUpperCase();
+  if (!/^(?:[0-9A-F]{3,4}|[0-9A-F]{6}|[0-9A-F]{8})$/.test(hex)) return void 0;
+  const long = hex.length <= 4 ? [...hex].map((digit) => digit + digit).join("") : hex;
+  if (long.length === 8 && !long.endsWith("FF")) return void 0;
+  return long.slice(0, 6);
+}
+function schemeIdFromColours(colours, schemes = themes) {
+  const names = Object.keys(DISCOURSE_MAPPING);
+  for (const [id, theme] of Object.entries(schemes)) {
+    const { colors } = toDiscourseScheme(id, theme);
+    if (names.every((name) => normaliseHex2(colours[name]) === colors[name])) {
+      return id;
+    }
+  }
+  return void 0;
 }
 export {
   DISCOURSE_MAPPING,
+  DISCOURSE_ROW_COLOURS,
   MIN_TEXT_CONTRAST,
   THEME_KEYS,
   contrast,
   contrastFailures,
   cssVarName,
   defaultTheme,
+  discourseRowColours,
   generateTheme,
   pickRoles,
   raceColours,
+  schemeIdFromColours,
   themeFromRoles,
   themeIds,
   themeMode,
