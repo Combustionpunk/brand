@@ -34,7 +34,7 @@ describe("about.json", () => {
     expect(about.about_url).toBe("https://github.com/Combustionpunk/brand");
   });
 
-  it("offers members only its own schemes, every one of them selectable", () => {
+  it("offers members only its own schemes (making them stick is the install step in docs/discourse-install.md)", () => {
     expect(about.modifiers).toEqual({ only_theme_color_schemes: true });
   });
 
@@ -51,6 +51,30 @@ describe("about.json", () => {
       const scheme = toDiscourseScheme(id, themes[id]!);
       expect(about.color_schemes[scheme.name]).toEqual(scheme.colors);
     }
+  });
+
+  it("keeps the palette names live already has, because Discourse matches palettes by name on update (#9)", () => {
+    // A renamed palette is a new row on the forum: user_selectable goes back to false and members lose their choice.
+    // Renaming one is a Board decision, with the console step in docs/discourse-install.md run again after the update.
+    expect(Object.keys(about.color_schemes)).toEqual([
+      "RC Misfits: Pit Lane",
+      "RC Misfits: Pit Lane light",
+      "RC Misfits: Synthwave",
+      "RC Misfits: Synthwave light",
+      "RC Misfits: Garage",
+      "RC Misfits: Garage light",
+      "RC Misfits: Fluoro",
+      "RC Misfits: Fluoro light",
+      "RC Misfits: Racing Green",
+      "RC Misfits: Racing Green light",
+      "RC Misfits: Works Blue",
+      "RC Misfits: Works Blue light",
+      "RC Misfits: Red Line",
+      "RC Misfits: Red Line light",
+      "RC Misfits: Sunset",
+      "RC Misfits: Sunset light",
+      "RC Misfits: Ice (light)",
+    ]);
   });
 
   it("defines hover and selected in every colour scheme", () => {
