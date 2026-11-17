@@ -1,4 +1,5 @@
-import { mix } from "./colour.ts";
+import { contrast, mix } from "./colour.ts";
+import { MIN_TEXT_CONTRAST } from "./contrast.ts";
 import { themeMode } from "./css.ts";
 import type { Theme, ThemeColours, ThemeKey } from "./types.ts";
 import { themes as defaultThemes } from "./tokens.ts";
@@ -326,4 +327,87 @@ export function discourseVariables(colours: ThemeColours): Record<string, string
   set("--calendar-close-to-working-hours", choose(desaturate(adjustLightness(tertiary, 0.45), 0.15), adjustLightness(tertiary, -0.15)));
   set("--calendar-in-working-hours", choose(desaturate(adjustLightness(tertiary, 0.4), 0.2), adjustLightness(tertiary, -0.1)));
   return out;
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Readable greys (#13).
+ *
+ * Discourse derives its greys from `primary` and `secondary`, and in light palettes (and on the
+ * hover row in some dark ones) the ones it uses for secondary text fall under 4.5:1: dates,
+ * counts, "replies", metadata. The forum overrides just those, moving each towards `primary` only
+ * as far as it takes.
+ * ------------------------------------------------------------------------------------------- */
+
+/**
+ * The derived variables that carry text on the page and on the rows of lists and menus, and why.
+ * Found by where core's stylesheets use them as `color:` (core at 3aff54f, 17 Nov 2026).
+ *
+ * Left out on purpose: `--primary-low-mid` (and `-400`, `-500`, `--primary-low-mid-or-...`), which
+ * core uses for icons, drag handles, borders, placeholders and disabled controls, none of them
+ * text that WCAG asks 4.5:1 of; darkening it to 4.5:1 would also push `-medium` and `-high` darker
+ * and flatten the ladder. And `--primary-low`, `--primary-very-low` and the `secondary-*` shades
+ * on their own, which are backgrounds and borders.
+ */
+export const DISCOURSE_TEXT_SHADES: Readonly<Record<string, string>> = {
+  "--primary-medium": "Metadata: dates, counts, \"replies\", post info. Core's most used text grey (about 380 uses).",
+  "--primary-high": "Secondary text: excerpts, labels, user stats, quotes' names (about 190 uses).",
+  "--primary-very-high": "Strong secondary text: user stream times, tags in choosers, the wizard.",
+  "--primary-600": "The numbered scale's twin of --primary-medium, used as text.",
+  "--primary-700": "Text in the numbered scale (between medium and high).",
+  "--primary-800": "The numbered scale's twin of --primary-high, used as text.",
+  "--primary-900": "Topic list headings and metadata, and default button text, in core's newer topic list.",
+  "--primary-med-or-secondary-med": "Text: --primary-medium in light palettes, --secondary-medium in dark (about 40 uses).",
+  "--primary-med-or-secondary-high": "Text: the categories page's topic counts and activity; --secondary-high in dark.",
+  "--primary-high-or-secondary-low": "Text: --primary-high in light palettes, --secondary-low in dark.",
+};
+
+/** The ladders whose order the overrides keep: each step at least as far from the page as the one before. */
+const TEXT_LADDERS = [
+  ["--primary-medium", "--primary-high", "--primary-very-high"],
+  ["--primary-600", "--primary-700", "--primary-800", "--primary-900"],
+];
+
+/** The backgrounds text shades sit on: the page and the row under the pointer. */
+const TEXT_BACKGROUNDS = ["--secondary", "--d-hover"];
+
+/**
+ * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page or the hover
+ * row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
+ * The ladders keep their order: a step that would end up nearer the page than the one before it
+ * takes that step's colour.
+ */
+export function readableTextShades(vars: Record<string, string>): Record<string, string> {
+  const primary = vars["--primary"]!;
+  const backgrounds = TEXT_BACKGROUNDS.map((name) => vars[name]!);
+  const passes = (hex: string) => backgrounds.every((bg) => contrast(hex, bg) >= MIN_TEXT_CONTRAST);
+  const fixed: Record<string, string> = { ...vars };
+  const out: Record<string, string> = {};
+
+  for (const name of Object.keys(DISCOURSE_TEXT_SHADES)) {
+    const start = vars[name]!;
+    if (passes(start)) continue;
+    // The smallest share of the way to primary that passes. Primary itself passes (the tokens' tests).
+    let [lo, hi] = [0, 1];
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (passes(mix(start, primary, mid))) hi = mid;
+      else lo = mid;
+    }
+    fixed[name] = out[name] = mix(start, primary, hi);
+  }
+
+  const page = vars["--secondary"]!;
+  for (const ladder of TEXT_LADDERS) {
+    for (let i = 1; i < ladder.length; i++) {
+      const [before, name] = [ladder[i - 1]!, ladder[i]!];
+      if (contrast(fixed[name]!, page) < contrast(fixed[before]!, page)) fixed[name] = out[name] = fixed[before]!;
+    }
+  }
+  return out;
+}
+
+/** `discourseVariables` with the readable text shades: what the forum sets for a theme. */
+export function forumVariables(colours: ThemeColours): Record<string, string> {
+  const vars = discourseVariables(colours);
+  return { ...vars, ...readableTextShades(vars) };
 }

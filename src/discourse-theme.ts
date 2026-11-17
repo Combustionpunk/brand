@@ -6,7 +6,7 @@
  * See docs/discourse-install.md for installing it.
  */
 import { sharedDeclarations, themeDeclarations } from "./css.ts";
-import { toDiscourseScheme, type DiscourseScheme } from "./discourse.ts";
+import { discourseVariables, readableTextShades, toDiscourseScheme, type DiscourseScheme } from "./discourse.ts";
 import type { ThemeKey, Tokens } from "./types.ts";
 
 /**
@@ -131,9 +131,13 @@ export function renderThemeScss(tokens: Tokens, fontsCss: string, headerCss: str
     fonts.trim() + "\n",
     "/* Shared tokens: type, spacing, radii and race colours. */\n" + rule(":root", sharedDeclarations(tokens)),
     `/* The brand theme Discourse is showing. The component's script sets ${FORUM_THEME_ATTRIBUTE} on <html>. */`,
-    ...discourseSchemeOrder(tokens).map((id) =>
-      `/* ${tokens.themes[id]!.name} */\n` + rule(`html[${FORUM_THEME_ATTRIBUTE}="${id}"]`, themeDeclarations(tokens.themes[id]!.colours)),
-    ),
+    ...discourseSchemeOrder(tokens).map((id) => {
+      const colours = tokens.themes[id]!.colours;
+      // Discourse's derived greys that carry text, where they miss 4.5:1 (#13). This selector beats
+      // the :root of Discourse's palette stylesheet.
+      const shades = Object.entries(readableTextShades(discourseVariables(colours))).map(([name, value]) => `${name}: ${value};`);
+      return `/* ${tokens.themes[id]!.name} */\n` + rule(`html[${FORUM_THEME_ATTRIBUTE}="${id}"]`, [...themeDeclarations(colours), ...shades]);
+    }),
     "/* A colour scheme that is not a brand theme: Discourse's own colours. */\n" +
       rule(`html:not([${FORUM_THEME_ATTRIBUTE}])`, fallback),
     "/* Discourse's text in Inter, its headings in Oswald. */\n" +

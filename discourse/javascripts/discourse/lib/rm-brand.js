@@ -252,6 +252,10 @@ function themeDeclarations(colours) {
   return [`color-scheme: ${themeMode(colours)};`, ...THEME_KEYS.map((key) => `${cssVarName(key)}: ${colours[key]};`)];
 }
 
+// src/contrast.ts
+var MIN_TEXT_CONTRAST = 4.5;
+var MIN_LIGHTNESS_SEPARATION = 1.25;
+
 // tokens.json
 var tokens_default = {
   defaultTheme: "pit-lane",
@@ -1020,13 +1024,56 @@ function discourseVariables(colours) {
   set("--calendar-in-working-hours", choose(desaturate(adjustLightness(tertiary, 0.4), 0.2), adjustLightness(tertiary, -0.1)));
   return out;
 }
+var DISCOURSE_TEXT_SHADES = {
+  "--primary-medium": `Metadata: dates, counts, "replies", post info. Core's most used text grey (about 380 uses).`,
+  "--primary-high": "Secondary text: excerpts, labels, user stats, quotes' names (about 190 uses).",
+  "--primary-very-high": "Strong secondary text: user stream times, tags in choosers, the wizard.",
+  "--primary-600": "The numbered scale's twin of --primary-medium, used as text.",
+  "--primary-700": "Text in the numbered scale (between medium and high).",
+  "--primary-800": "The numbered scale's twin of --primary-high, used as text.",
+  "--primary-900": "Topic list headings and metadata, and default button text, in core's newer topic list.",
+  "--primary-med-or-secondary-med": "Text: --primary-medium in light palettes, --secondary-medium in dark (about 40 uses).",
+  "--primary-med-or-secondary-high": "Text: the categories page's topic counts and activity; --secondary-high in dark.",
+  "--primary-high-or-secondary-low": "Text: --primary-high in light palettes, --secondary-low in dark."
+};
+var TEXT_LADDERS = [
+  ["--primary-medium", "--primary-high", "--primary-very-high"],
+  ["--primary-600", "--primary-700", "--primary-800", "--primary-900"]
+];
+var TEXT_BACKGROUNDS = ["--secondary", "--d-hover"];
+function readableTextShades(vars) {
+  const primary = vars["--primary"];
+  const backgrounds = TEXT_BACKGROUNDS.map((name) => vars[name]);
+  const passes = (hex) => backgrounds.every((bg) => contrast(hex, bg) >= MIN_TEXT_CONTRAST);
+  const fixed = { ...vars };
+  const out = {};
+  for (const name of Object.keys(DISCOURSE_TEXT_SHADES)) {
+    const start = vars[name];
+    if (passes(start)) continue;
+    let [lo, hi] = [0, 1];
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (passes(mix(start, primary, mid))) hi = mid;
+      else lo = mid;
+    }
+    fixed[name] = out[name] = mix(start, primary, hi);
+  }
+  const page = vars["--secondary"];
+  for (const ladder of TEXT_LADDERS) {
+    for (let i = 1; i < ladder.length; i++) {
+      const [before, name] = [ladder[i - 1], ladder[i]];
+      if (contrast(fixed[name], page) < contrast(fixed[before], page)) fixed[name] = out[name] = fixed[before];
+    }
+  }
+  return out;
+}
+function forumVariables(colours) {
+  const vars = discourseVariables(colours);
+  return { ...vars, ...readableTextShades(vars) };
+}
 
 // src/discourse-theme.ts
 var FORUM_THEME_ATTRIBUTE = "data-rm-theme";
-
-// src/contrast.ts
-var MIN_TEXT_CONTRAST = 4.5;
-var MIN_LIGHTNESS_SEPARATION = 1.25;
 
 // src/generate.ts
 var NEUTRAL_CHROMA = 0.12;
@@ -1222,7 +1269,7 @@ function matchMyCarCss(colours, mode) {
   const theme = generateTheme(colours, mode);
   const lines = [
     ...themeDeclarations(theme),
-    ...Object.entries(discourseVariables(theme)).map(([name, value]) => `${name}: ${value};`)
+    ...Object.entries(forumVariables(theme)).map(([name, value]) => `${name}: ${value};`)
   ];
   return `html[${FORUM_THEME_ATTRIBUTE}="${MATCH_MY_CAR_THEME}"] {
 ${lines.map((line) => `  ${line}`).join("\n")}

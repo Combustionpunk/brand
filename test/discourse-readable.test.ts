@@ -30,10 +30,14 @@ const cases: Array<[string, ThemeColours]> = [
   ),
 ];
 
-/** The ladders whose order must survive: each step at least as far from the page as the one before. */
+/**
+ * The ladders whose order must survive: each step at least as far from the page as the one before.
+ * They start at the background steps the overrides never touch (Discourse's own lightest steps,
+ * `-50` and `-100`, are within a hair of each other and not always in order).
+ */
 const LADDERS = [
-  ["--primary-very-low", "--primary-low", "--primary-low-mid", "--primary-medium", "--primary-high", "--primary-very-high"],
-  ["--primary-50", "--primary-100", "--primary-200", "--primary-300", "--primary-400", "--primary-500", "--primary-600", "--primary-700", "--primary-800", "--primary-900"],
+  ["--primary-low", "--primary-low-mid", "--primary-medium", "--primary-high", "--primary-very-high"],
+  ["--primary-200", "--primary-300", "--primary-400", "--primary-500", "--primary-600", "--primary-700", "--primary-800", "--primary-900"],
 ];
 
 const BACKGROUNDS = ["--secondary", "--d-hover"] as const;
@@ -80,15 +84,18 @@ describe("the forum's text shades, for every palette and Match my car sample", (
       const overrides = readableTextShades(original);
       for (const [name, value] of Object.entries(overrides)) {
         expect(Object.keys(DISCOURSE_TEXT_SHADES), name).toContain(name);
-        expect(weakest(original, name), `${name} already passed`).toBeLessThan(MIN_TEXT_CONTRAST);
         expect(value).toMatch(/^#[0-9A-F]{6}$/);
-        // Just over the line, unless the shade order pushed it further (it then matches the step below it).
+        // Just over the line, unless the shade order moved it (it then takes the colour of the step below it).
         const fixed = { ...original, ...overrides };
-        const below = LADDERS.flatMap((ladder) => ladder.slice(0, ladder.indexOf(name)).map((n) => fixed[n]));
-        if (!below.includes(value)) expect(weakest(fixed, name), `${name}: ${value}`).toBeLessThan(MIN_TEXT_CONTRAST + 0.25);
+        const below = LADDERS.flatMap((ladder) => (ladder.includes(name) ? ladder.slice(0, ladder.indexOf(name)) : [])).map((n) => fixed[n]);
+        if (below.includes(value)) continue;
+        expect(weakest(original, name), `${name} already passed`).toBeLessThan(MIN_TEXT_CONTRAST);
+        expect(weakest(fixed, name), `${name}: ${value}`).toBeLessThan(MIN_TEXT_CONTRAST + 0.25);
       }
+      // A shade that passed stays as it was, unless the shade order moved it.
+      const ordered = (name: string) => LADDERS.some((ladder) => ladder.includes(name) && overrides[ladder[ladder.indexOf(name) - 1]!] === overrides[name]);
       for (const name of Object.keys(DISCOURSE_TEXT_SHADES)) {
-        if (weakest(original, name) >= MIN_TEXT_CONTRAST) expect(overrides[name], name).toBeUndefined();
+        if (weakest(original, name) >= MIN_TEXT_CONTRAST && !ordered(name)) expect(overrides[name], name).toBeUndefined();
       }
     });
   }

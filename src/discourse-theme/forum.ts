@@ -6,7 +6,7 @@
 import { defineHeader } from "../header/header.ts";
 import { isHex } from "../colour.ts";
 import { themeDeclarations } from "../css.ts";
-import { DISCOURSE_MAPPING, discourseVariables, schemeIdFromColours } from "../discourse.ts";
+import { DISCOURSE_MAPPING, forumVariables, schemeIdFromColours } from "../discourse.ts";
 import { FORUM_THEME_ATTRIBUTE } from "../discourse-theme.ts";
 import { generateTheme } from "../generate.ts";
 import type { ThemeMode } from "../types.ts";
@@ -56,8 +56,8 @@ export function matchMyCarColours(user: MatchMyCarUser | null | undefined): stri
 }
 
 /**
- * The CSS for Match my car: every colour variable Discourse defines, and the brand's `--rm-*`
- * tokens, for the theme generated from `colours` in `mode`. The selector
+ * The CSS for Match my car: every colour variable Discourse defines (with its text greys made
+ * readable, #13), and the brand's `--rm-*` tokens, for the theme generated from `colours` in `mode`. The selector
  * `html[data-rm-theme="match-my-car"]` is more specific than the `:root` of Discourse's palette
  * stylesheets, so it wins whichever loads last.
  */
@@ -65,7 +65,7 @@ export function matchMyCarCss(colours: readonly string[], mode: ThemeMode): stri
   const theme = generateTheme(colours, mode);
   const lines = [
     ...themeDeclarations(theme),
-    ...Object.entries(discourseVariables(theme)).map(([name, value]) => `${name}: ${value};`),
+    ...Object.entries(forumVariables(theme)).map(([name, value]) => `${name}: ${value};`),
   ];
   return `html[${FORUM_THEME_ATTRIBUTE}="${MATCH_MY_CAR_THEME}"] {\n${lines.map((line) => `  ${line}`).join("\n")}\n}\n`;
 }
