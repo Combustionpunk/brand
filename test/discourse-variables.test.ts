@@ -8,6 +8,7 @@ import { discourseVariables, toDiscourseScheme } from "../src/discourse.ts";
 import { generateTheme } from "../src/generate.ts";
 import { themes } from "../src/tokens.ts";
 import type { ThemeMode } from "../src/types.ts";
+import { CARS } from "./fixtures/cars.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -91,14 +92,6 @@ describe("discourseVariables", () => {
     expect(discourseVariables(themes["pit-lane-light"]!.colours)["--scheme-type"]).toBe("light");
   });
 });
-
-/** Race colours the Board asked about: a light yellow, a dark navy, and a red and white pair. */
-const CARS: Record<string, string[]> = {
-  "light yellow": ["#FFF59D"],
-  "dark navy": ["#0B1F4B"],
-  "red and white": ["#D50000", "#FFFFFF"],
-  "fluoro yellow, navy and white": ["#E6FF00", "#14213D", "#FFFFFF"],
-};
 
 describe("Match my car on the forum: readable whatever the race colours", () => {
   for (const [car, colours] of Object.entries(CARS)) {
