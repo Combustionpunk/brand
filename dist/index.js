@@ -579,6 +579,12 @@ function toHex({ r, g, b }) {
 function normaliseHex(hex) {
   return toHex(parseHex(hex));
 }
+function mix(from, to, share) {
+  const a = parseHex(from);
+  const b = parseHex(to);
+  const w = Math.min(1, Math.max(0, share));
+  return toHex({ r: a.r + (b.r - a.r) * w, g: a.g + (b.g - a.g) * w, b: a.b + (b.b - a.b) * w });
+}
 function rgbToHsl({ r, g, b }) {
   const rn = r / 255;
   const gn = g / 255;
@@ -904,15 +910,26 @@ var DISCOURSE_MAPPING = {
   success: "pb",
   love: "danger"
 };
+var DISCOURSE_ROW_COLOURS = ["hover", "selected"];
+var SELECTED_ACCENT_SHARE = 0.2;
+function discourseRowColours(colours) {
+  return {
+    hover: colours.line,
+    selected: mix(colours.bg, colours.accent, SELECTED_ACCENT_SHARE)
+  };
+}
 function toDiscourseScheme(id, theme) {
   const names = Object.keys(DISCOURSE_MAPPING);
+  const bare = (hex) => hex.replace(/^#/, "").toUpperCase();
+  const rows = discourseRowColours(theme.colours);
   return {
     id,
     name: `RC Misfits: ${theme.name}`,
     dark: theme.mode === "dark",
-    colors: Object.fromEntries(
-      names.map((name) => [name, theme.colours[DISCOURSE_MAPPING[name]].replace(/^#/, "").toUpperCase()])
-    )
+    colors: Object.fromEntries([
+      ...names.map((name) => [name, bare(theme.colours[DISCOURSE_MAPPING[name]])]),
+      ...DISCOURSE_ROW_COLOURS.map((name) => [name, bare(rows[name])])
+    ])
   };
 }
 function normaliseHex2(value) {
@@ -934,12 +951,14 @@ function schemeIdFromColours(colours, schemes = themes) {
 }
 export {
   DISCOURSE_MAPPING,
+  DISCOURSE_ROW_COLOURS,
   MIN_TEXT_CONTRAST,
   THEME_KEYS,
   contrast,
   contrastFailures,
   cssVarName,
   defaultTheme,
+  discourseRowColours,
   generateTheme,
   pickRoles,
   raceColours,

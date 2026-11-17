@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { schemeIdFromColours, toDiscourseScheme } from "../src/discourse.ts";
+import { DISCOURSE_MAPPING, schemeIdFromColours, toDiscourseScheme } from "../src/discourse.ts";
 import {
   FORUM_THEME_ATTRIBUTE,
   discourseSchemeOrder,
@@ -50,6 +50,20 @@ describe("about.json", () => {
     for (const id of themeIds) {
       const scheme = toDiscourseScheme(id, themes[id]!);
       expect(about.color_schemes[scheme.name]).toEqual(scheme.colors);
+    }
+  });
+
+  it("defines hover and selected in every colour scheme", () => {
+    const schemes = Object.entries(about.color_schemes);
+    expect(schemes).toHaveLength(themeIds.length);
+    for (const [name, colours] of schemes) {
+      expect(colours.hover, name).toMatch(/^[0-9A-F]{6}$/);
+      expect(colours.selected, name).toMatch(/^[0-9A-F]{6}$/);
+    }
+    const committed = JSON.parse(read("discourse/about.json")) as typeof about;
+    for (const [name, colours] of Object.entries(committed.color_schemes)) {
+      expect(colours.hover, name).toMatch(/^[0-9A-F]{6}$/);
+      expect(colours.selected, name).toMatch(/^[0-9A-F]{6}$/);
     }
   });
 
@@ -150,7 +164,9 @@ describe("matching Discourse's live colours to a brand theme", () => {
       short: { ...themes["pit-lane-light"]!, colours: { ...themes["pit-lane-light"]!.colours, text: "#112233", bg: "#FFFFFF", surface: "#EEEEEE", accent: "#AA5500", fast: "#0055AA", danger: "#CC0000", pb: "#007744" } },
     };
     const { colors } = toDiscourseScheme("short", schemes.short);
-    const live = Object.fromEntries(Object.entries(colors).map(([k, v]) => [k, shorten(v)]));
+    // Only the mapped colours: the page's hover and selected are not read.
+    const mapped = Object.keys(DISCOURSE_MAPPING).map((name) => [name, colors[name as keyof typeof colors]] as const);
+    const live = Object.fromEntries(mapped.map(([k, v]) => [k, shorten(v)]));
     expect(Object.values(live).every((v) => v.length === 4)).toBe(true);
     expect(schemeIdFromColours(live, schemes)).toBe("short");
     for (const id of themeIds) {
@@ -170,6 +186,13 @@ describe("matching Discourse's live colours to a brand theme", () => {
     const { colors } = toDiscourseScheme("pit-lane", themes["pit-lane"]!);
     expect(schemeIdFromColours({ ...colors, tertiary: "123456" })).toBeUndefined();
     expect(schemeIdFromColours({})).toBeUndefined();
+  });
+
+  it("matches on the mapped colours only: hover and selected are not read from the page", () => {
+    const { colors } = toDiscourseScheme("synthwave", themes["synthwave"]!);
+    const { hover: _hover, selected: _selected, ...mapped } = colors;
+    expect(schemeIdFromColours(mapped)).toBe("synthwave");
+    expect(schemeIdFromColours({ ...colors, hover: "F2F2F2", selected: "D1F0FF" })).toBe("synthwave");
   });
 
   it("tells every pair of themes apart", () => {

@@ -323,6 +323,10 @@ Every timing number uses figures of equal width, so columns line up and digits d
 | `danger` | `danger` | Errors and delete buttons. |
 | `success` | `pb` | The theme's bright green. |
 | `love` | `danger` | The like heart: the theme's red. |
+| `hover` | `line` | The row under the pointer in dropdowns, menus and the sidebar. |
+| `selected` | `bg` mixed 20% towards `accent` | The chosen row: the page tinted with the accent. |
+
+`hover` and `selected` come from `discourseRowColours(colours)`. Without them Discourse fills in its own light values, which are unreadable in a dark palette. The theme's `text` is at least 4.5:1 on both in every theme (tested).
 
 Hex values have no `#`, as Discourse stores them.
 

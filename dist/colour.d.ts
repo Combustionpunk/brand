@@ -17,6 +17,8 @@ export declare function parseHex(hex: string): Rgb;
 export declare function toHex({ r, g, b }: Rgb): string;
 /** Upper-case `#RRGGBB` from any accepted hex form. */
 export declare function normaliseHex(hex: string): string;
+/** `from` moved towards `to` in sRGB: a `share` of 0 gives `from`, 1 gives `to`. */
+export declare function mix(from: string, to: string, share: number): string;
 export declare function rgbToHsl({ r, g, b }: Rgb): Hsl;
 export declare function hslToRgb({ h, s, l }: Hsl): Rgb;
 export declare const hexToHsl: (hex: string) => Hsl;

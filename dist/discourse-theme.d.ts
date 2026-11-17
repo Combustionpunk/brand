@@ -1,4 +1,4 @@
-import { type DiscourseColourName } from "./discourse.js";
+import { type DiscourseScheme } from "./discourse.js";
 import type { ThemeKey, Tokens } from "./types.js";
 /**
  * The attribute on `<html>` that names the brand theme on the forum. Not `data-theme`, to keep
@@ -34,7 +34,7 @@ export interface AboutJson {
     modifiers: {
         only_theme_color_schemes: true;
     };
-    color_schemes: Record<string, Record<DiscourseColourName, string>>;
+    color_schemes: Record<string, DiscourseScheme["colors"]>;
 }
 /**
  * The theme's `about.json`.

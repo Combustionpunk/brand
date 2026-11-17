@@ -69,6 +69,8 @@ This is the brand's own rule (README, "Choose the theme"): Pit Lane, or Pit Lane
 
 On a current Discourse, the modifier already offers every `RC Misfits: …` palette, and only those, under **Preferences › Interface**. Members pick a light and a dark palette there, and the top bar follows whichever is showing.
 
+A member who chose a palette before RC Misfits became the default keeps that choice, but it is not one of the theme's palettes. The **Color palette** dropdown shows its ID number (for example "7"), and the forum uses the theme's default. They choose a palette again.
+
 On an older Discourse (no `only_theme_color_schemes`), an admin does it once per palette: **Admin › Appearance › Color palettes**, open each `RC Misfits: …` palette and tick **Users can select**.
 
 ## Update
@@ -91,6 +93,7 @@ Before live, on the dev forum:
 2. Signed out: the top bar shows **Sign in**, the forum is Pit Lane (or Pit Lane light on a light device), and the headings are Oswald.
 3. Sign in: the top bar shows the username. Search, notifications and the user menu still work.
 4. In Preferences › Interface, choose Synthwave: the forum and the top bar both turn Synthwave.
-5. Sign out from the top bar: you are signed out (Discourse's own logout).
-6. On a phone width (< 640 px), the top bar's menu opens and closes.
-7. Screenshot each step in the PR.
+5. In Synthwave and in Pit Lane light, open a dropdown (for example Admin › Users › a user › Trust Level): the row under the pointer and the chosen row are both readable.
+6. Sign out from the top bar: you are signed out (Discourse's own logout).
+7. On a phone width (< 640 px), the top bar's menu opens and closes.
+8. Screenshot each step in the PR.

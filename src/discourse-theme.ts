@@ -6,7 +6,7 @@
  * See docs/discourse-install.md for installing it.
  */
 import { sharedDeclarations, themeDeclarations } from "./css.ts";
-import { toDiscourseScheme, type DiscourseColourName } from "./discourse.ts";
+import { toDiscourseScheme, type DiscourseScheme } from "./discourse.ts";
 import type { ThemeKey, Tokens } from "./types.ts";
 
 /**
@@ -84,7 +84,7 @@ export interface AboutJson {
   authors: string;
   assets: Record<string, string>;
   modifiers: { only_theme_color_schemes: true };
-  color_schemes: Record<string, Record<DiscourseColourName, string>>;
+  color_schemes: Record<string, DiscourseScheme["colors"]>;
 }
 
 /**

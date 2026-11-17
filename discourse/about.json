@@ -24,7 +24,9 @@
       "highlight": "FFC72C",
       "danger": "FF6B5E",
       "success": "4CC38A",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "353840",
+      "selected": "453B1E"
     },
     "RC Misfits: Pit Lane light": {
       "primary": "1B1C1F",
@@ -36,7 +38,9 @@
       "highlight": "946700",
       "danger": "A92116",
       "success": "1C7E4D",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "DEDBD2",
+      "selected": "E1D7BF"
     },
     "RC Misfits: Synthwave": {
       "primary": "F7F3FA",
@@ -48,7 +52,9 @@
       "highlight": "FF3EA5",
       "danger": "FF6B5E",
       "success": "5CF2A6",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "3A2860",
+      "selected": "43153E"
     },
     "RC Misfits: Synthwave light": {
       "primary": "22123A",
@@ -60,7 +66,9 @@
       "highlight": "C2187A",
       "danger": "A92116",
       "success": "127F55",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "E2D5EC",
+      "selected": "EDC8E1"
     },
     "RC Misfits: Garage": {
       "primary": "F3EEE6",
@@ -72,7 +80,9 @@
       "highlight": "FF6B1A",
       "danger": "FF5EA1",
       "success": "6BD38A",
-      "love": "FF5EA1"
+      "love": "FF5EA1",
+      "hover": "3E3A33",
+      "selected": "492A18"
     },
     "RC Misfits: Garage light": {
       "primary": "24221E",
@@ -84,7 +94,9 @@
       "highlight": "C04400",
       "danger": "A91653",
       "success": "1C7B4C",
-      "love": "A91653"
+      "love": "A91653",
+      "hover": "E1DFDB",
+      "selected": "EDD4C6"
     },
     "RC Misfits: Fluoro": {
       "primary": "F4F7EE",
@@ -96,7 +108,9 @@
       "highlight": "E6FF00",
       "danger": "FF6B5E",
       "success": "39FF14",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "2F3328",
+      "selected": "393F0A"
     },
     "RC Misfits: Fluoro light": {
       "primary": "22251D",
@@ -108,7 +122,9 @@
       "highlight": "6A7500",
       "danger": "A92116",
       "success": "1C7E4D",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "DFE2DA",
+      "selected": "DCDEC6"
     },
     "RC Misfits: Racing Green": {
       "primary": "F1EFE6",
@@ -120,7 +136,9 @@
       "highlight": "D4AF37",
       "danger": "FF6B5E",
       "success": "6FE39A",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "2A4033",
+      "selected": "36381B"
     },
     "RC Misfits: Racing Green light": {
       "primary": "182A20",
@@ -132,7 +150,9 @@
       "highlight": "846B1C",
       "danger": "A92116",
       "success": "1C7E4D",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "D5E7DD",
+      "selected": "DEDDCB"
     },
     "RC Misfits: Works Blue": {
       "primary": "F3F6FC",
@@ -144,7 +164,9 @@
       "highlight": "FDD835",
       "danger": "FF6B5E",
       "success": "5CE6A0",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "24396A",
+      "selected": "3B3D31"
     },
     "RC Misfits: Works Blue light": {
       "primary": "141C2E",
@@ -156,7 +178,9 @@
       "highlight": "816901",
       "danger": "A92116",
       "success": "1C7B4C",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "D1D8EB",
+      "selected": "DDDAC8"
     },
     "RC Misfits: Red Line": {
       "primary": "F5F5F5",
@@ -168,7 +192,9 @@
       "highlight": "FF4D4A",
       "danger": "FF5EA1",
       "success": "4CD98A",
-      "love": "FF5EA1"
+      "love": "FF5EA1",
+      "hover": "34343A",
+      "selected": "411E1D"
     },
     "RC Misfits: Red Line light": {
       "primary": "212121",
@@ -180,7 +206,9 @@
       "highlight": "DE0400",
       "danger": "A91653",
       "success": "1C7B4C",
-      "love": "A91653"
+      "love": "A91653",
+      "hover": "DEDEDE",
+      "selected": "F2C6C6"
     },
     "RC Misfits: Sunset": {
       "primary": "FBF4EC",
@@ -192,7 +220,9 @@
       "highlight": "FFB22E",
       "danger": "FF6B5E",
       "success": "7FDB6A",
-      "love": "FF6B5E"
+      "love": "FF6B5E",
+      "hover": "433128",
+      "selected": "483216"
     },
     "RC Misfits: Sunset light": {
       "primary": "291C19",
@@ -204,7 +234,9 @@
       "highlight": "996100",
       "danger": "A92116",
       "success": "1C7B4C",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "E6D9D6",
+      "selected": "E6D8C5"
     },
     "RC Misfits: Ice (light)": {
       "primary": "0F2133",
@@ -216,7 +248,9 @@
       "highlight": "0275BA",
       "danger": "A92116",
       "success": "148150",
-      "love": "A92116"
+      "love": "A92116",
+      "hover": "D3E1EC",
+      "selected": "C2DDEE"
     }
   }
 }

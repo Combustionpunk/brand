@@ -138,6 +138,31 @@ function defineHeader() {
 }
 defineHeader();
 
+// src/colour.ts
+var HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+function parseHex(hex) {
+  const match = typeof hex === "string" ? HEX.exec(hex.trim()) : null;
+  if (!match) {
+    throw new RangeError(`Not a hex colour: ${String(hex)}`);
+  }
+  let digits = match[1];
+  if (digits.length === 3) {
+    digits = digits.replace(/./g, "$&$&");
+  }
+  const n = parseInt(digits, 16);
+  return { r: n >> 16 & 255, g: n >> 8 & 255, b: n & 255 };
+}
+var clampByte = (v) => Math.min(255, Math.max(0, Math.round(v)));
+function toHex({ r, g, b }) {
+  return "#" + [r, g, b].map((v) => clampByte(v).toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+function mix(from, to, share) {
+  const a = parseHex(from);
+  const b = parseHex(to);
+  const w = Math.min(1, Math.max(0, share));
+  return toHex({ r: a.r + (b.r - a.r) * w, g: a.g + (b.g - a.g) * w, b: a.b + (b.b - a.b) * w });
+}
+
 // tokens.json
 var tokens_default = {
   defaultTheme: "pit-lane",
@@ -711,15 +736,26 @@ var DISCOURSE_MAPPING = {
   success: "pb",
   love: "danger"
 };
+var DISCOURSE_ROW_COLOURS = ["hover", "selected"];
+var SELECTED_ACCENT_SHARE = 0.2;
+function discourseRowColours(colours) {
+  return {
+    hover: colours.line,
+    selected: mix(colours.bg, colours.accent, SELECTED_ACCENT_SHARE)
+  };
+}
 function toDiscourseScheme(id, theme) {
   const names = Object.keys(DISCOURSE_MAPPING);
+  const bare = (hex) => hex.replace(/^#/, "").toUpperCase();
+  const rows = discourseRowColours(theme.colours);
   return {
     id,
     name: `RC Misfits: ${theme.name}`,
     dark: theme.mode === "dark",
-    colors: Object.fromEntries(
-      names.map((name) => [name, theme.colours[DISCOURSE_MAPPING[name]].replace(/^#/, "").toUpperCase()])
-    )
+    colors: Object.fromEntries([
+      ...names.map((name) => [name, bare(theme.colours[DISCOURSE_MAPPING[name]])]),
+      ...DISCOURSE_ROW_COLOURS.map((name) => [name, bare(rows[name])])
+    ])
   };
 }
 function normaliseHex(value) {
