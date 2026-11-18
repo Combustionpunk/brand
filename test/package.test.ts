@@ -129,7 +129,7 @@ describe("the README agrees with the package", () => {
   const version = (JSON.parse(read("package.json")) as { version: string }).version;
 
   it("pins the install line to the package's own version", () => {
-    expect(version).toBe("0.4.0");
+    expect(version).toBe("0.5.0");
     const pinned = [...readme.matchAll(/pnpm add github:Combustionpunk\/brand#v(\S+)/g)].map((match) => match[1]);
     expect(pinned).toEqual([version]);
   });
@@ -144,6 +144,24 @@ describe("the README agrees with the package", () => {
     expect(examples.length).toBeGreaterThan(3);
     for (const example of examples) expect(example, example).not.toContain("sign-out-url");
     expect(readme).toContain("safe to GET");
+  });
+});
+
+describe("the changelog (#17)", () => {
+  const changelog = existsSync(resolve(root, "CHANGELOG.md")) ? read("CHANGELOG.md") : "";
+  const version = (JSON.parse(read("package.json")) as { version: string }).version;
+  const headings = [...changelog.matchAll(/^## (\d+\.\d+\.\d+)\b/gm)].map((match) => match[1]);
+
+  it("starts with the package's own version, then 0.4.0 and 0.3.0, newest first", () => {
+    expect(headings.slice(0, 3)).toEqual([version, "0.4.0", "0.3.0"]);
+  });
+
+  it("lists every light palette's shipped accent from #16", () => {
+    const section = changelog.split(/^## /m).find((part) => part.startsWith(`${version}`)) ?? "";
+    for (const theme of Object.values(themes).filter((t) => t.mode === "light")) {
+      expect(section, theme.name).toContain(theme.name);
+      expect(section.toUpperCase(), theme.name).toContain(theme.colours.accent.toUpperCase());
+    }
   });
 });
 
