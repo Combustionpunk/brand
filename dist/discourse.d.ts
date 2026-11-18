@@ -35,15 +35,15 @@ export type DiscourseColourName = keyof typeof DISCOURSE_MAPPING;
  */
 export declare const DISCOURSE_ROW_COLOURS: readonly ["hover", "selected"];
 export type DiscourseRowColour = (typeof DISCOURSE_ROW_COLOURS)[number];
-/** How far `selected` moves from the page background towards the accent. */
+/** The most `selected` moves from the page background towards the accent. */
 export declare const SELECTED_ACCENT_SHARE = 0.2;
 /**
- * The row colours for a theme, as `#RRGGBB`. Text on them is the theme's `text`.
+ * The row colours for a theme, as `#RRGGBB`. Text on them is the theme's `text`; links are its `accent`.
  *
  * | Discourse | From | Why |
  * |---|---|---|
- * | `hover` | `line` | A step away from the page that shows in light and dark themes alike. |
- * | `selected` | `bg` mixed 20% towards `accent` | The page tinted with the theme's accent. |
+ * | `hover` | `line`, moved towards `bg` in 1% steps until `accent` and `text` reach 4.5:1 on it | A step away from the page that shows in light and dark themes alike. Only Synthwave, Garage and Red Line (dark) move today (#15). |
+ * | `selected` | `bg` mixed up to 20% towards `accent`, in 0.5% steps, as far as `accent` still reaches 4.5:1 on it | The page tinted with the theme's accent, with links readable on it (#15). |
  */
 export declare function discourseRowColours(colours: ThemeColours): Record<DiscourseRowColour, string>;
 export interface DiscourseScheme {
@@ -85,8 +85,8 @@ export declare function discourseVariables(colours: ThemeColours): Record<string
  */
 export declare const DISCOURSE_TEXT_SHADES: Readonly<Record<string, string>>;
 /**
- * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page or the hover
- * row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
+ * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page, the hover
+ * row or the selected row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
  * The ladders keep their order: a step that would end up nearer the page than the one before it
  * takes that step's colour.
  */

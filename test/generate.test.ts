@@ -32,6 +32,10 @@ function expectSound(theme: ThemeColours, label: string) {
   for (const key of ["text", "muted", "accent", "pb", "fast", "danger", "warning"] as const) {
     expect(contrast(theme[key], theme.surface2), `${label} ${key} on surface2`).toBeGreaterThanOrEqual(4.5);
   }
+  // Light themes: links also reach 4.5:1 on the line colour, the forum's hover row (#15).
+  if (contrast(theme.bg, "#000000") > contrast(theme.bg, "#FFFFFF")) {
+    expect(contrast(theme.accent, theme.line), `${label} accent on line`).toBeGreaterThanOrEqual(4.5);
+  }
   // contrastFailures covers it, but spelled out: a personal best and a fastest lap differ in lightness.
   expect(contrast(theme.pb, theme.fast), `${label} pb against fast`).toBeGreaterThanOrEqual(MIN_LIGHTNESS_SEPARATION);
 }

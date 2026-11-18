@@ -225,15 +225,18 @@ The form is the one the timing site already has (its action and CSRF field stay 
 
 The six `-light` themes from Garage to Sunset come from the generator's light mode.
 
-Five colours differ from the design canvas. The Board made them darker (14 Nov 2026) so that each reaches 4.5:1 on its background:
+Some colours differ from the design canvas. The Board made five darker (14 Nov 2026) so that each reaches 4.5:1 on its background, and on 17 Nov 2026 (#15) darkened every light theme's `accent` so that links also reach 4.5:1 on `line` (the forum's hover row): each moved towards `text` by the smallest 1% step that passes.
 
-| Theme | Key | Canvas | Now |
-|---|---|---|---|
-| `pit-lane-light` | `accent` | `#B07A00` | `#946700` |
-| `pit-lane-light` | `pb` | `#1F8A55` | `#1C7E4D` |
-| `synthwave-light` | `pb` | `#13865A` | `#127F55` |
-| `ice` | `accent` | `#0277BD` | `#0275BA` |
-| `ice` | `pb` | `#158A55` | `#148150` |
+| Theme | Key | Canvas | 14 Nov | Now (#15) |
+|---|---|---|---|---|
+| `pit-lane-light` | `accent` | `#B07A00` | `#946700` | `#7F5A05` |
+| `pit-lane-light` | `pb` | `#1F8A55` | `#1C7E4D` | `#1C7E4D` |
+| `synthwave-light` | `accent` | `#C2187A` | `#C2187A` | `#B41774` |
+| `synthwave-light` | `pb` | `#13865A` | `#127F55` | `#127F55` |
+| `ice` | `accent` | `#0277BD` | `#0275BA` | `#0467A3` |
+| `ice` | `pb` | `#158A55` | `#148150` | `#148150` |
+
+The generated `-light` themes follow the same rule through the generator: Garage light `#C04400` → `#AC4004`, Fluoro light `#6A7500` → `#606A04`, Racing Green light `#846B1C` → `#77631C`, Works Blue light `#816901` → `#715D08`, Red Line light `#DE0400` → `#C70704`, Sunset light `#996100` → `#875604`.
 
 ### Theme keys
 
@@ -293,6 +296,7 @@ Every timing number uses figures of equal width, so columns line up and digits d
 - The **highlight** (`fast`) is the third colour, else the accent's opposite hue. If that opposite would be the personal-best green, it moves on to blue.
 - `pb` is a fixed green. `good`, `danger` and `warning` are fixed too. `danger` moves from red to rose when the accent itself is red or orange.
 - The lightness of the accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` is adjusted until each is at least 4.5:1 on `bg`, `surface` and `surface2`.
+- In light mode the accent is also at least 4.5:1 on `line` (the forum's hover row), moved towards `text` in 1% steps (#15).
 - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
 - With no chromatic colour (no colours, or all white, black and silver), the result is Pit Lane (or Pit Lane light). Like all generator output it is held to the contrast rules, so a Pit Lane value that misses them comes out a little lighter or darker than in the built-in theme.
 - The same colour given twice counts once.
@@ -323,10 +327,10 @@ Every timing number uses figures of equal width, so columns line up and digits d
 | `danger` | `danger` | Errors and delete buttons. |
 | `success` | `pb` | The theme's bright green. |
 | `love` | `danger` | The like heart: the theme's red. |
-| `hover` | `line` | The row under the pointer in dropdowns, menus and the sidebar. |
-| `selected` | `bg` mixed 20% towards `accent` | The chosen row: the page tinted with the accent. |
+| `hover` | `line`, moved towards `bg` in 1% steps until `accent` and `text` reach 4.5:1 on it | The row under the pointer in dropdowns, menus and the sidebar. Only Synthwave, Garage and Red Line (dark) move. |
+| `selected` | `bg` mixed up to 20% towards `accent`, as far as `accent` stays at 4.5:1 on it | The chosen row: the page tinted with the accent. |
 
-`hover` and `selected` come from `discourseRowColours(colours)`. Without them Discourse fills in its own light values, which are unreadable in a dark palette. The theme's `text` is at least 4.5:1 on both in every theme (tested).
+`hover` and `selected` come from `discourseRowColours(colours)`. Without them Discourse fills in its own light values, which are unreadable in a dark palette. The theme's `text` and `accent` (links) are at least 4.5:1 on both in every theme and in Match my car's themes (tested), and so is every grey the forum uses for text.
 
 Hex values have no `#`, as Discourse stores them.
 

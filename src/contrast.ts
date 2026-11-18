@@ -1,4 +1,4 @@
-import { contrast } from "./colour.ts";
+import { contrast, mix } from "./colour.ts";
 import type { ThemeColours, ThemeKey } from "./types.ts";
 
 /** Body text must reach this on its background (WCAG AA). */
@@ -63,4 +63,16 @@ export function contrastFailures(colours: ThemeColours): ContrastFailure[] {
     check(pair, MIN_LIGHTNESS_SEPARATION);
   }
   return failures;
+}
+
+/**
+ * `from` moved towards `to` in 1% steps (sRGB, as `mix`), by the fewest steps that make `passes`
+ * true: `from` itself if it already passes, `to` if nothing short of it does.
+ */
+export function smallestMix(from: string, to: string, passes: (hex: string) => boolean): string {
+  for (let step = 0; step < 100; step++) {
+    const hex = mix(from, to, step / 100);
+    if (passes(hex)) return hex;
+  }
+  return mix(from, to, 1);
 }

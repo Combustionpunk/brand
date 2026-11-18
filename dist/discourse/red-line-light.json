@@ -5,15 +5,15 @@
   "colors": {
     "primary": "212121",
     "secondary": "F7F7F7",
-    "tertiary": "DE0400",
+    "tertiary": "C70704",
     "quaternary": "0057C4",
     "header_background": "FFFFFF",
     "header_primary": "212121",
-    "highlight": "DE0400",
+    "highlight": "C70704",
     "danger": "A91653",
     "success": "1C7B4C",
     "love": "A91653",
     "hover": "DEDEDE",
-    "selected": "F2C6C6"
+    "selected": "F1D9D9"
   }
 }

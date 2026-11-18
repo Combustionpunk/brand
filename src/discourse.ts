@@ -1,5 +1,5 @@
 import { contrast, mix } from "./colour.ts";
-import { MIN_TEXT_CONTRAST } from "./contrast.ts";
+import { MIN_TEXT_CONTRAST, smallestMix } from "./contrast.ts";
 import { themeMode } from "./css.ts";
 import type { Theme, ThemeColours, ThemeKey } from "./types.ts";
 import { themes as defaultThemes } from "./tokens.ts";
@@ -44,21 +44,30 @@ export const DISCOURSE_ROW_COLOURS = ["hover", "selected"] as const;
 
 export type DiscourseRowColour = (typeof DISCOURSE_ROW_COLOURS)[number];
 
-/** How far `selected` moves from the page background towards the accent. */
+/** The most `selected` moves from the page background towards the accent. */
 export const SELECTED_ACCENT_SHARE = 0.2;
 
 /**
- * The row colours for a theme, as `#RRGGBB`. Text on them is the theme's `text`.
+ * The row colours for a theme, as `#RRGGBB`. Text on them is the theme's `text`; links are its `accent`.
  *
  * | Discourse | From | Why |
  * |---|---|---|
- * | `hover` | `line` | A step away from the page that shows in light and dark themes alike. |
- * | `selected` | `bg` mixed 20% towards `accent` | The page tinted with the theme's accent. |
+ * | `hover` | `line`, moved towards `bg` in 1% steps until `accent` and `text` reach 4.5:1 on it | A step away from the page that shows in light and dark themes alike. Only Synthwave, Garage and Red Line (dark) move today (#15). |
+ * | `selected` | `bg` mixed up to 20% towards `accent`, in 0.5% steps, as far as `accent` still reaches 4.5:1 on it | The page tinted with the theme's accent, with links readable on it (#15). |
  */
 export function discourseRowColours(colours: ThemeColours): Record<DiscourseRowColour, string> {
+  const readable = (row: string) => [colours.accent, colours.text].every((fg) => contrast(fg, row) >= MIN_TEXT_CONTRAST);
+  let selected = colours.bg;
+  for (let step = SELECTED_ACCENT_SHARE * 200; step > 0; step--) {
+    const tint = mix(colours.bg, colours.accent, step / 200);
+    if (readable(tint)) {
+      selected = tint;
+      break;
+    }
+  }
   return {
-    hover: colours.line,
-    selected: mix(colours.bg, colours.accent, SELECTED_ACCENT_SHARE),
+    hover: smallestMix(colours.line, colours.bg, readable),
+    selected,
   };
 }
 
@@ -369,12 +378,12 @@ const TEXT_LADDERS = [
   ["--primary-600", "--primary-700", "--primary-800", "--primary-900"],
 ];
 
-/** The backgrounds text shades sit on: the page and the row under the pointer. */
-const TEXT_BACKGROUNDS = ["--secondary", "--d-hover"];
+/** The backgrounds text shades sit on: the page, the row under the pointer and the chosen row. */
+const TEXT_BACKGROUNDS = ["--secondary", "--d-hover", "--d-selected"];
 
 /**
- * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page or the hover
- * row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
+ * The text shades of `vars` (from `discourseVariables`) that miss 4.5:1 on the page, the hover
+ * row or the selected row, each moved towards `--primary` just far enough, as `#RRGGBB`. Shades that pass are left out.
  * The ladders keep their order: a step that would end up nearer the page than the one before it
  * takes that step's colour.
  */

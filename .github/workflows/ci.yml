@@ -1,5 +1,6 @@
-# Runs on every PR and on main: install, typecheck, tests, build, and a check that the logo
-# masters are untouched. Changes to documentation only (docs/ and Markdown files) are skipped.
+# Runs on every PR and on main: install, typecheck, tests, build (failing if the committed dist/ or
+# discourse/ is stale), and a check that the logo masters are untouched. Changes to documentation
+# only (docs/ and Markdown files) are skipped.
 name: CI
 
 on:
@@ -42,7 +43,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build
+      # Builds, then fails if the committed dist/ or discourse/ is out of date (#15).
+      - run: pnpm check:dist
 
       - name: The logo in assets/logo/ is unchanged
         run: |

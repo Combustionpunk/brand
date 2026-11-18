@@ -39,6 +39,7 @@ export declare function themeFromRoles(roles: ThemeRoles, mode?: ThemeMode): The
  * - `pb` is a fixed green.
  * - Accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` are adjusted in lightness until
  *   each reaches 4.5:1 on `bg`, `surface` and `surface2`.
+ * - In light mode the accent also reaches 4.5:1 on `line`, moved towards `text` in 1% steps.
  * - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
  * - With no chromatic colour at all (none given, or all white), the result is Pit Lane, with
  *   lightness adjusted where Pit Lane itself misses the rules above.

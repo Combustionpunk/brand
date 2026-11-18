@@ -13,7 +13,7 @@
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build, type Plugin } from "esbuild";
 import sharp from "sharp";
@@ -53,11 +53,13 @@ await build({
 const raw: Plugin = {
   name: "raw",
   setup(plugin) {
+    // The path is kept relative to the repo: esbuild writes it into the bundle as a comment, and an
+    // absolute one would differ on every machine, so `pnpm check:dist` would always fail in CI.
     plugin.onResolve({ filter: /\?raw$/ }, (args) => ({
-      path: resolve(args.resolveDir, args.path.slice(0, -"?raw".length)),
+      path: relative(root, resolve(args.resolveDir, args.path.slice(0, -"?raw".length))).split(sep).join("/"),
       namespace: "raw",
     }));
-    plugin.onLoad({ filter: /.*/, namespace: "raw" }, (args) => ({ contents: readFileSync(args.path, "utf8"), loader: "text" }));
+    plugin.onLoad({ filter: /.*/, namespace: "raw" }, (args) => ({ contents: readFileSync(resolve(root, args.path), "utf8"), loader: "text" }));
   },
 };
 await build({

@@ -82,9 +82,11 @@ describe("Discourse colour schemes", () => {
         expect(colors.hover).not.toBe(colors.selected);
       });
 
-      it(`${id}: hover is the theme's line colour and selected is the page tinted with the accent`, () => {
-        expect(hover).toBe(theme.colours.line.toUpperCase());
-        expect(selected).toBe(mix(theme.colours.bg, theme.colours.accent, 0.2));
+      it(`${id}: hover is the line colour (nearer the page if links need it) and selected the page tinted with the accent`, () => {
+        // test/links-readable.test.ts (#15) checks how far each moves.
+        expect(hover === theme.colours.line.toUpperCase() || contrast(theme.colours.accent, theme.colours.line) < MIN_TEXT_CONTRAST).toBe(true);
+        const tints = Array.from({ length: 201 }, (_, k) => mix(theme.colours.bg, theme.colours.accent, k / 1000));
+        expect(tints).toContain(selected);
       });
     }
   });

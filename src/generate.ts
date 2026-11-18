@@ -6,7 +6,7 @@
  */
 import { chroma, contrast, hexToHsl, hslToHex, normaliseHex } from "./colour.ts";
 import type { Hsl } from "./colour.ts";
-import { MIN_LIGHTNESS_SEPARATION, MIN_TEXT_CONTRAST } from "./contrast.ts";
+import { MIN_LIGHTNESS_SEPARATION, MIN_TEXT_CONTRAST, smallestMix } from "./contrast.ts";
 import { tokens } from "./tokens.ts";
 import type { ThemeColours, ThemeMode } from "./types.ts";
 
@@ -150,7 +150,14 @@ export function statusColours(
 function accessible(raw: ThemeColours, mode: ThemeMode): ThemeColours {
   const grounds = [raw.bg, raw.surface, raw.surface2];
   const pb = reach(raw.pb, grounds, mode);
-  const accent = reach(raw.accent, grounds, mode);
+  const text = reach(raw.text, grounds, mode);
+  let accent = reach(raw.accent, grounds, mode);
+  if (mode === "light") {
+    // Links also sit on the line colour: the forum's hover row (#15). Darken towards the text,
+    // which keeps the hue, by the smallest 1% step that reaches 4.5:1 there. On a dark theme the
+    // forum moves its hover row nearer the page instead, and the accent stays as picked.
+    accent = smallestMix(accent, text, (hex) => contrast(hex, raw.line) >= MIN_TEXT_CONTRAST);
+  }
   let danger = reach(raw.danger, grounds, mode);
   let warning = reach(raw.warning, grounds, mode);
   // Amber is the lighter of the two on a dark ground; red is the darker on a light one.
@@ -161,7 +168,7 @@ function accessible(raw: ThemeColours, mode: ThemeMode): ThemeColours {
   }
   return {
     ...raw,
-    text: reach(raw.text, grounds, mode),
+    text,
     muted: reach(raw.muted, grounds, mode),
     accent,
     onAccent:
@@ -268,6 +275,7 @@ export function themeFromRoles(roles: ThemeRoles, mode: ThemeMode = "dark"): The
  * - `pb` is a fixed green.
  * - Accent, `fast`, `pb`, `text`, `muted`, `danger` and `warning` are adjusted in lightness until
  *   each reaches 4.5:1 on `bg`, `surface` and `surface2`.
+ * - In light mode the accent also reaches 4.5:1 on `line`, moved towards `text` in 1% steps.
  * - `pb` and `fast`, and `danger` and `warning`, also differ in lightness.
  * - With no chromatic colour at all (none given, or all white), the result is Pit Lane, with
  *   lightness adjusted where Pit Lane itself misses the rules above.
