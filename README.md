@@ -12,12 +12,13 @@ The one source of the RC Misfits look: design tokens, the theme generator, fonts
 ### 1. Install, pinned to a tag
 
 ```sh
-pnpm add github:Combustionpunk/brand#v0.4.0
+pnpm add github:Combustionpunk/brand#v0.5.0
 ```
 
 - The package name is `@rcmisfits/brand`.
 - `dist/` is committed, so nothing is built on install.
 - Always pin a tag. A change of token names is a major version.
+- What changed in each release: [CHANGELOG.md](CHANGELOG.md).
 
 ### 2. Import the CSS
 

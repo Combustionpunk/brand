@@ -38,7 +38,7 @@ The RC Misfits look on the forum (Discourse) is a **Discourse theme** built from
    git branch -D discourse-theme-new
    ```
 
-   `discourse-vX.Y.Z` is the release being published, e.g. `discourse-v0.4.0`.
+   `discourse-vX.Y.Z` is the release being published, e.g. `discourse-v0.5.0`. Use the same number as the package release (`v0.5.0` → `discourse-v0.5.0`). There is no `discourse-v0.4.0`: the forum goes from `discourse-v0.3.0` straight to `discourse-v0.5.0`. What changed in each release is in `CHANGELOG.md`.
 
    - **It uses only git's built-in `filter-branch`**, so it works in a GitHub Codespace, whose git may have no `git subtree` (it is an optional add-on to git). The first publish was done this way (`discourse-theme` at `46c78fa`, tagged `discourse-v0.3.0`, the same tree as `discourse/` on main at `8d71d1b`).
    - **Every release must use this method.** `filter-branch` gives the same commits each time for the same history, so a normal push fast-forwards. `git subtree split` is not guaranteed to give the same ids (it can differ on some histories, for example with merges), so switching method can stop the push fast-forwarding.
