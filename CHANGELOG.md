@@ -4,7 +4,7 @@ Apps pin a tag: `pnpm add github:Combustionpunk/brand#vX.Y.Z`. The forum install
 
 ## 0.5.0
 
-Readable text everywhere on the forum, and darker accents in the light palettes. No token names change.
+Readable text everywhere on the forum, and darker accents in the light palettes. No token names change. The forum theme is published as `discourse-v0.5.0`; there is no `discourse-v0.4.0` (the forum goes from `discourse-v0.3.0` to `discourse-v0.5.0`).
 
 - **Darker light-palette accents (#16).** Each light palette's `accent` is darkened towards `text` by the smallest 1% step that makes links reach 4.5:1 on `line` (the forum's hover row). The generator does the same in light mode, so Match my car light and the generated `-light` themes follow. The dark palettes are unchanged.
 
@@ -32,6 +32,6 @@ Readable text everywhere on the forum, and darker accents in the light palettes.
 
 ## 0.3.0
 
-- **The forum theme (#6).** `pnpm build` also writes `discourse/`: every theme as a Discourse palette (`RC Misfits: <theme>`, Pit Lane first), Oswald and Inter as theme assets, tabular figures for counts, dates and tables, and the shared `<rm-header site="forum">` above Discourse's own header. Install, update and roll back are in `docs/discourse-install.md`. Published as `discourse-v0.3.0`.
+- **The forum theme (#6).** `pnpm build` also writes `discourse/`: every theme as a Discourse palette (`RC Misfits: <theme>`, Pit Lane first, with `hover` and `selected` row colours), Oswald and Inter as theme assets, tabular figures for counts, dates and tables, and the shared `<rm-header site="forum">` above Discourse's own header. Install, update and roll back are in `docs/discourse-install.md`. Published as `discourse-v0.3.0`.
 
 Earlier releases: `v0.1.0` (tokens, the theme generator, fonts, the logo) and `v0.2.0` (the shared header, `<rm-header>`).
